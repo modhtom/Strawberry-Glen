@@ -74,13 +74,13 @@ Each cow has a **name**, **mood**, and **quirk**. Mood affects milk yield & dial
 
 Spend coins to improve shop:
 
-| Upgrade            | Cost | Effect                             |
-| ------------------ | ---- | ---------------------------------- |
-| Bigger Counter     | 500  | Hold 3 items at once               |
-| Cute Signage       | 750  | +10% sell price                    |
+| Upgrade           | Cost | Effect                             |
+| ----------------- | ---- | ---------------------------------- |
+| Bigger Counter    | 500  | Hold 3 items at once               |
+| Cute Signage      | 750  | +10% sell price                    |
 | Ghost Acceptance™ | 1000 | Ghost customers arrive at night    |
-| Loyalty Card       | 1500 | Regular customers daily            |
-| Orders Board       | 2000 | Daily quest orders → bonus payouts |
+| Loyalty Card      | 1500 | Regular customers daily            |
+| Orders Board      | 2000 | Daily quest orders → bonus payouts |
 
 ### 🏆 Baking Contest
 
@@ -92,3 +92,23 @@ Spend coins to improve shop:
   - Glump the Ogre (burnt goods fan)
   - Sir Meowster (only pink treats)
 - **Rewards:** Coins, Fame (↑shop traffic), Exclusive ingredients
+
+### 🥣 Items
+
+Item ID | Name | Notes
+1 | Wheat Seeds | Plantable, used in baking
+2 | Strawberry Seeds | Plantable, used in baking
+3 | Watering Can | Needed for watering crops
+4 | Fertilizer | Speeds up growth
+10 | Wheat | From planted wheat seeds
+11 | Strawberry | From planted strawberries
+12 | Egg | From Chickens
+20 | Milk | Collected from cows
+21 | Butter | Processed from milk
+30 | Bread | Wheat-based
+31 | Strawberry Tart | Strawberry + Wheat
+32 | Strawberry Milk Cake | Strawberry + Milk + Wheat
+33 | Burnt Pie | Failed/incorrect recipe output
+34 | Experimental Jam | Crafted from gift combo
+40 | Eldermint Leaves | Needed for Berry's tea quest
+41 | Cow Flute | Calms angry cows

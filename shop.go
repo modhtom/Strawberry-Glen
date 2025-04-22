@@ -6,10 +6,13 @@ import (
 )
 
 var (
-	playerGold = 100 // starting money
-	shopOpen   = false
-	shopCursor = 0
-	shopMode   = 0 // 0 = Buy, 1 = Sell
+	playerGold                  = 100 // starting money
+	shopOpen                    = false
+	shopCursor                  = 0
+	shopMode                    = 0 // 0 = Buy, 1 = Sell
+	shopRestockTimer    float32 = 0
+	shopRestockInterval float32 = 300.0 // 5 minutes
+	initialShopStock            = make([]int, len(shopItems))
 )
 
 type ShopItem struct {
@@ -35,7 +38,7 @@ func findInventorySlot(id int) (*InventorySlot, bool) {
 	return nil, false
 }
 
-func addToInventory(id int, name string, reusable bool, qty int) {
+func addToInventory(id int, name string, reusable bool, qty int) bool {
 	for i := range playerInv.Slots {
 		if playerInv.Slots[i].ItemID == 0 {
 			playerInv.Slots[i] = InventorySlot{
@@ -44,10 +47,11 @@ func addToInventory(id int, name string, reusable bool, qty int) {
 				ItemReusable: reusable,
 				ItemQuantity: qty,
 			}
-			return
+			return true
 		}
 	}
 	showMessages("There is no room left in your Inventory.")
+	return false
 }
 
 func drawShop() {

@@ -24,8 +24,9 @@ var (
 	houseSprite  rl.Texture2D
 	hillSprite   rl.Texture2D
 	waterSprite  rl.Texture2D
-	flowerSprite rl.Texture2D
+	fenceSprite  rl.Texture2D
 	tilledSprite rl.Texture2D
+	doorSprite   rl.Texture2D
 
 	tileDest   rl.Rectangle
 	tileSrc    rl.Rectangle
@@ -36,11 +37,12 @@ var (
 	playerSprite                                  rl.Texture2D
 	playerSrc                                     rl.Rectangle
 	playerDest                                    rl.Rectangle
-	playerSpeed                                   float32 = 3
+	playerSpeed                                   float32 = 1.5
 	playerMoving                                  bool
 	playerDir                                     int
 	playerUp, playerDown, playerLeft, playerRight bool
 	playerFrame                                   int
+	playerInv                                     Inventory
 
 	frameCount int
 
@@ -55,6 +57,9 @@ var (
 	messageText     string
 	messageTimer    float32
 	messageDuration float32 = 2.0
+
+	showKeyBindings bool
+	gameSave        bool
 )
 
 func drawScene() {
@@ -76,13 +81,15 @@ func drawScene() {
 		case "t":
 			tex = tilledSprite
 		case "f":
-			tex = flowerSprite
+			tex = fenceSprite
+		case "d":
+			tex = doorSprite
 		default:
 			tex = grassSprite
 		}
-		if srcMap[i] == "h" || srcMap[i] == "f" {
-			tileSrc.X = 0
-			tileSrc.Y = 0
+		if srcMap[i] == "h" || srcMap[i] == "d" || srcMap[i] == "f" {
+			tileSrc.X = 10
+			tileSrc.Y = 25
 			rl.DrawTexturePro(grassSprite, tileSrc, tileDest,
 				rl.NewVector2(tileDest.Width, tileDest.Height), 0, rl.White)
 		}
@@ -93,6 +100,7 @@ func drawScene() {
 		rl.DrawTexturePro(tex, tileSrc, tileDest,
 			rl.NewVector2(tileDest.Width, tileDest.Height), 0, rl.White)
 	}
+
 	rl.DrawTexturePro(playerSprite, playerSrc, playerDest,
 		rl.NewVector2(playerDest.Width, playerDest.Height), 0, rl.White)
 }
@@ -100,7 +108,7 @@ func drawScene() {
 func drawPauseMenu() {
 	rl.DrawRectangle(0, 0, screenWidth, screenHeight, rl.NewColor(0, 0, 0, 180))
 
-	box := rl.NewRectangle(screenWidth/2-120, screenHeight/2-100, 240, 220)
+	box := rl.NewRectangle(screenWidth/2-120, screenHeight/2-100, 400, 220)
 	rl.DrawRectangleRec(box, rl.NewColor(80, 10, 10, 230))
 	rl.DrawRectangleLines(int32(box.X), int32(box.Y), int32(box.Width), int32(box.Height), rl.White)
 	rl.DrawText("PAUSED", int32(box.X+60), int32(box.Y+10), 30, rl.White)
@@ -112,8 +120,42 @@ func drawPauseMenu() {
 	}{
 		{rl.NewRectangle(box.X+20, box.Y+60, 200, 40), "Return to Game", func() { paused = false }},
 		{rl.NewRectangle(box.X+20, box.Y+110, 200, 40), "Toggle Sound", func() { musicPaused = !musicPaused }},
-		{rl.NewRectangle(box.X+20, box.Y+160, 200, 40), "Main Menu", func() { running = false }},
+		{rl.NewRectangle(box.X+20, box.Y+160, 200, 40), "Save", func() { gameSave = !gameSave }},
+		{rl.NewRectangle(box.X+20, box.Y+210, 200, 40), "keybindings", func() { showKeyBindings = !showKeyBindings }},
+		{rl.NewRectangle(box.X+20, box.Y+260, 200, 40), "Main Menu", func() { running = false }},
 	}
+
+	mousePos := rl.GetMousePosition()
+	for _, btn := range buttons {
+		color := rl.DarkGray
+		if rl.CheckCollisionPointRec(mousePos, btn.rect) {
+			color = rl.Gray
+			if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+				btn.action()
+			}
+		}
+		rl.DrawRectangleRec(btn.rect, color)
+		rl.DrawText(btn.text, int32(btn.rect.X+10), int32(btn.rect.Y+10), 20, rl.White)
+	}
+}
+
+func drawKeybindings() {
+	rl.DrawRectangle(0, 0, screenWidth, screenHeight, rl.NewColor(0, 0, 0, 180))
+
+	box := rl.NewRectangle(screenWidth/2-120, screenHeight/2-100, 250, 300)
+	rl.DrawRectangleRec(box, rl.NewColor(80, 10, 10, 230))
+	rl.DrawRectangleLines(int32(box.X), int32(box.Y), int32(box.Width), int32(box.Height), rl.White)
+	rl.DrawText("keybindings", int32(box.X+60), int32(box.Y+10), 30, rl.White)
+	rl.DrawText("Use arrow keys or WASD to move.", int32(box.X+20), int32(box.Y+50), 30, rl.White)
+	rl.DrawText("Zoom in with 'Z', zoom out with 'X'.", int32(box.X+20), int32(box.Y+90), 30, rl.White)
+	rl.DrawText("Use 'I' to open your Inventory.", int32(box.X+20), int32(box.Y+130), 30, rl.White)
+	rl.DrawText("Use 'B' to open Shop.", int32(box.X+20), int32(box.Y+170), 30, rl.White)
+	buttons := []struct {
+		rect   rl.Rectangle
+		text   string
+		action func()
+	}{
+		{rl.NewRectangle(box.X+100, box.Y+200, 200, 40), "Close Window", func() { showKeyBindings = false }}}
 
 	mousePos := rl.GetMousePosition()
 	for _, btn := range buttons {
@@ -138,6 +180,88 @@ func input() {
 		return
 	}
 
+	if playerInv.Open {
+		mp := rl.GetMousePosition()
+		slotWidth := float32((screenWidth - 100) / InventorySize)
+		baseX, baseY := float32(50), float32(60)
+
+		playerInv.HoveredSlot = -1
+
+		for i := range InventorySize {
+			x := baseX + slotWidth*float32(i)
+			r := rl.NewRectangle(x, baseY, slotWidth-10, 80)
+			if rl.CheckCollisionPointRec(mp, r) {
+				playerInv.HoveredSlot = i
+				if rl.IsMouseButtonPressed(rl.MouseLeftButton) || rl.IsKeyPressed(rl.KeyEnter) {
+					useInventoryItem(i)
+				}
+				break
+			}
+		}
+		if rl.IsKeyPressed(rl.KeyI) {
+			playerInv.Open = !playerInv.Open
+			playerInv.HoveredSlot = -1
+		}
+		if rl.IsKeyPressed(rl.KeyLeft) {
+			playerInv.Cursor--
+			if playerInv.Cursor < 0 {
+				playerInv.Cursor = InventorySize - 1
+			}
+		}
+		if rl.IsKeyPressed(rl.KeyRight) {
+			playerInv.Cursor = (playerInv.Cursor + 1) % InventorySize
+		}
+		return
+	}
+
+	if rl.IsKeyPressed(rl.KeyB) {
+		shopOpen = !shopOpen
+		shopCursor = 0
+		shopMode = 0
+	}
+	if shopOpen {
+		// navigate shop
+		if rl.IsKeyPressed(rl.KeyUp) {
+			shopCursor = (shopCursor - 1 + len(shopItems)) % len(shopItems)
+		}
+		if rl.IsKeyPressed(rl.KeyDown) {
+			shopCursor = (shopCursor + 1) % len(shopItems)
+		}
+		if rl.IsKeyPressed(rl.KeyLeft) || rl.IsKeyPressed(rl.KeyRight) {
+			shopMode ^= 1
+		}
+		if rl.IsKeyPressed(rl.KeyEnter) {
+			item := &shopItems[shopCursor]
+			slot, found := findInventorySlot(item.ID)
+			switch shopMode {
+			case 0: // BUY
+				if playerGold >= item.PriceBuy && item.Stock > 0 {
+					playerGold -= item.PriceBuy
+					item.Stock--
+					if found {
+						slot.ItemQuantity++
+					} else {
+						if ok := addToInventory(item.ID, Items[item.ID].Name, false, 1); !ok {
+							playerGold += item.PriceBuy
+							item.Stock++
+						}
+					}
+				}
+			case 1: // SELL
+				if found && slot.ItemQuantity > 0 {
+					playerGold += item.PriceSell
+					item.Stock++
+					slot.ItemQuantity--
+					if slot.ItemQuantity == 0 {
+						slot.ItemID = 0
+						slot.ItemName = ""
+					}
+				}
+			}
+		}
+		return
+	}
+
 	if rl.IsKeyDown(rl.KeyW) || rl.IsKeyDown(rl.KeyUp) {
 		playerMoving = true
 		playerDir = 1
@@ -157,6 +281,11 @@ func input() {
 		playerMoving = true
 		playerDir = 3
 		playerRight = true
+	}
+
+	if rl.IsKeyPressed(rl.KeyI) {
+		playerInv.Open = !playerInv.Open
+		playerInv.HoveredSlot = -1
 	}
 
 	if rl.IsKeyPressed(rl.KeyZ) {
@@ -211,6 +340,15 @@ func update() {
 		rl.ResumeMusicStream(music)
 	}
 
+	shopRestockTimer += rl.GetFrameTime()
+	if shopRestockTimer >= shopRestockInterval {
+		shopRestockTimer -= shopRestockInterval
+		for i := range shopItems {
+			shopItems[i].Stock = initialShopStock[i]
+		}
+		showMessages("Shop has been restocked!")
+	}
+
 	cam.Target = rl.NewVector2(float32(playerDest.X-(playerDest.Width/2)),
 		float32(playerDest.Y-(playerDest.Height/2)))
 
@@ -229,10 +367,19 @@ func render() {
 
 	drawMessage()
 
-	if paused {
-		drawPauseMenu()
+	if shopOpen {
+		drawShop()
+	} else {
+		if playerInv.Open {
+			drawInventory()
+		}
+		if paused {
+			drawPauseMenu()
+		}
+		if showKeyBindings {
+			drawKeybindings()
+		}
 	}
-
 	rl.EndDrawing()
 }
 
@@ -256,7 +403,7 @@ func loadMap(mapFile string) {
 
 	total := mapW * mapH
 	if len(tokens) < 2+2*total {
-		fmt.Printf("expected %d tiles + %d src glyphs, got %d tokens",
+		fmt.Printf("expected %d tiles %d src glyphs, got %d tokens",
 			total, total, len(tokens)-2)
 	}
 	tileMap = make([]int, total)
@@ -279,7 +426,7 @@ func drawMessage() {
 		return
 	}
 
-	messageTimer += 0.015
+	messageTimer += 0.005
 	if messageTimer > messageDuration {
 		showMessage = false
 		return
@@ -311,14 +458,16 @@ func init() {
 	rl.InitWindow(screenWidth, screenHeight, "Strawberry Glen")
 	rl.SetExitKey(0)
 	rl.SetTargetFPS(60)
-	showMessages("Whoa there, speedster! Use arrow keys or WASD to move.\nZoom in with 'Z', zoom out with 'X'.\nPress ESC to pause and catch your breath.")
+	showMessages("Whoa there\nPress ESC to pause catch your breath,\nknow more about the game keybindings, and Save your progress.")
 
 	grassSprite = rl.LoadTexture("assets/Tilesets/Grass.png")
 	houseSprite = rl.LoadTexture("assets/Tilesets/Wooden_House_Walls_Tilset.png")
 	hillSprite = rl.LoadTexture("assets/Tilesets/Hills.png")
 	tilledSprite = rl.LoadTexture("assets/Tilesets/Tilled_Dirt.png")
 	waterSprite = rl.LoadTexture("assets/Tilesets/Water.png")
-	flowerSprite = rl.LoadTexture("assets/Tilesets/Fences.png")
+	fenceSprite = rl.LoadTexture("assets/Tilesets/Fences.png")
+	doorSprite = rl.LoadTexture("assets/Tilesets/Doors.png")
+	loadItemSprites()
 
 	tileDest = rl.NewRectangle(0, 0, 16, 16)
 	tileSrc = rl.NewRectangle(0, 0, 16, 16)
@@ -327,6 +476,13 @@ func init() {
 	playerSrc = rl.NewRectangle(0, 0, 48, 48)
 	playerDest = rl.NewRectangle(200, 200, 100, 100)
 
+	playerInv = Inventory{Open: false, Cursor: 0, HoveredSlot: -1}
+	playerInv.Slots[0] = InventorySlot{ItemID: 3, ItemName: Items[3].Name, ItemReusable: true}                     // Watering Can
+	playerInv.Slots[1] = InventorySlot{ItemID: 4, ItemName: Items[4].Name, ItemReusable: true}                     // Hoe
+	playerInv.Slots[2] = InventorySlot{ItemID: 5, ItemName: Items[5].Name, ItemReusable: true}                     // Axe
+	playerInv.Slots[3] = InventorySlot{ItemID: 1, ItemName: Items[1].Name, ItemReusable: false, ItemQuantity: 5}   // Wheat Seeds
+	playerInv.Slots[4] = InventorySlot{ItemID: 22, ItemName: Items[22].Name, ItemReusable: false, ItemQuantity: 6} // Egg
+
 	rl.InitAudioDevice()
 	music = rl.LoadMusicStream("assets/audio/amb.mp3")
 	musicPaused = false
@@ -334,7 +490,15 @@ func init() {
 
 	cam = rl.NewCamera2D(rl.NewVector2(float32(screenWidth/2), float32(screenHeight/2)),
 		rl.NewVector2(float32(playerDest.X-(playerDest.Width/2)),
-			float32(playerDest.Y-(playerDest.Height/2))), 0.0, 1.0)
+			float32(playerDest.Y-(playerDest.Height/2))), 0.0, 2.0)
+
+	gameSave = false
+
+	showKeyBindings = false
+
+	for i, it := range shopItems {
+		initialShopStock[i] = it.Stock
+	}
 
 	loadMap("assets/one.map")
 }
