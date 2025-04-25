@@ -8,12 +8,15 @@ Rapidly mock up core interaction (walking, planting, harvesting).
 
 2. Core Mechanics & Systems Tile & Collision System
 
-Finalize tile‐collision metadata (walkable, impassable, interactive)
-and responses (e.g., “You can’t walk in water!” or slipping in mud).
+Finalize tile‐collision metadata (walkable, impassable, interactive) --DONE--
+and responses (e.g., “You can’t walk in water!” or slipping in mud). --DONE--
 
 Build a semantic map layer (object entities, crops, shop counters) separate from rendering layer.
 
-Time & Progression System Implement day/night cycle, growth timers, bake queues,
+Time & Progression System
+Implement day/night cycle,
+growth timers,
+bake queues,
 and scheduling for NPC routines.
 
 Game Loops

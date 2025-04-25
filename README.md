@@ -1,114 +1,139 @@
-# Strawberry Glen
+# 🍓 Strawberry Glen
 
-**Strawberry Glen** is a cozy, quirky 2D farm‑bakery sim where you inherit an enchanted bakery‑farm, raise strawberries and cows, bake whimsical recipes, and uncover a floury conspiracy—all on your quest to earn 2 million coins and win the Grand Glen Bake‑Off.
+A whimsical 2D farm-bakery simulator where you inherit a magical farm, grow enchanted strawberries, bake quirky recipes, and unravel doughy mysteries. Earn coins, befriend moody cows, and win the Grand Glen Bake-Off!
 
----
-
-## 📖 Table of Contents
-
-1. [Game Vision & Narrative Hooks](#game-vision--narrative-hooks)
-2. [Core Loop & Paper Prototype](#core-loop--paper-prototype)
-3. [Systems & Mechanics](#systems--mechanics)
-   - Recipe Discovery
-   - Cow Personalities
-   - Shop Upgrades
-   - Baking Contest
+![Gameplay Preview](assets/preview.png)
 
 ---
 
-## 🎨 Game Vision & Narrative Hooks
+## 🌟 Features
 
-**Working Title:** _Strawberry Glen_
-
-**Core Fantasy:** You’re the reluctant heir to Aunt Marmalade’s magical bakery‑farm. She vanished into the “dough dimension,” leaving behind a moody cow, sentient strawberries, and debt to a mushroom syndicate. Plant, bake, and barter your way to 2M coins, win the Bake‑Off, and unearth the bakery’s secrets.
-
-**Tone:** Wholesome but weird
-
-**Win Condition:** Earn 2 million coins, win the Grand Glen Bake‑Off, and unlock a secret ending by maxing out cow friendship.
-
----
-
-## 🧪 Core Loop & Paper Prototype
-
-Before art or polish, prove the loop is fun. Prototype in a single scene:
-
-1. **Farm Loop:** Plant → Water → Grow (3 days) → Harvest → Inventory
-2. **Cow Loop:** Feed daily → Milk (2‑day cycle) → Miss feed = grumpy cow
-3. **Baking Loop:** Combine 2–3 ingredients at oven → Wait 5 s → Get product
-4. **Sales Loop:** Place on shop counter → Auto‑sell → Update coins & UI
-5. **Time Loop:** 1 s = 1 game hour, 12 ticks = new day, trigger growth & cow reset
-
-**Prototype Checklist:**
-
-- [ ] 10×10 field movement & tile metadata
-- [ ] Planting, watering, harvesting logic
-- [ ] Cow entity with feed/milk interaction
-- [ ] Baking UI & combination logic
-- [ ] Shop counter auto‑sell
-- [ ] Day/night transitions
-- [ ] Coin & inventory HUD + basic SFX
+- **Farming & Crafting**: Plant seeds, harvest crops, and bake magical goods like _Strawberry Milk Cake_ and _Experimental Jam_.
+- **Cow Companions**: Manage cows with unique personalities—grumpy Moozart loves jazz, while Cowculus philosophizes in the rain.
+- **Dynamic Shop**: Buy/sell items, upgrade your store, and attract ghost customers with _Ghost Acceptance™_ upgrades.
+- **Inventory System**: Manage tools, seeds, and baked goods across 5 slots. Reusable tools and stackable items supported!
+- **Quests & Secrets**: Collect _Eldermint Leaves_ and craft the _Cow Flute_ to calm angry cows and uncover hidden lore.
+- **Whimsical Tone**: Burnt pies, sentient strawberries, and a mushroom syndicate debt—charm meets chaos!
 
 ---
 
-## 🛠️ Systems & Mechanics
+## 🛠️ Installation
 
-### 🍰 Recipe Discovery System
+1. **Prerequisites**:
 
-- **Mechanic:** Use 2–3 ingredients in the oven
-- **Known recipes:** Starter combos loaded by default
-- **Discoverable:** Unrecognized combos generate funny names and log as new recipes
-- **Examples:**
-  - 🍓+🌾 → Tart
-  - 🥛+🌾 → Cream Bun
-  - 🍓+🥛+🌾 → Strawberry Milk Cake
+   - [Go](https://golang.org/dl/) (1.16+)
+   - [Raylib](https://www.raylib.com/) (C library) and [raylib-go](https://github.com/gen2brain/raylib-go) bindings.
 
-### 🐮 Cow Personalities
+2. **Run the Game**:
+   ```bash
+   git clone https://github.com/yourusername/strawberry-glen.git
+   cd strawberry-glen
+   go run main.go inventory.go shop.go
+   ```
 
-Each cow has a **name**, **mood**, and **quirk**. Mood affects milk yield & dialogue.
+---
 
-- **Moozart:** Grumpy until serenaded (jazz unlocks bonus milk)
-- **Cowculus:** Philosophical in rain, produces flavored milk if happy
-- **Dairyssa:** Dramatic, requires baked gift to boost mood
+## 🥧 How to Play
 
-### 🏪 Shop Upgrades
+1. **Farming**:
+   - Collect seeds (e.g., `Wheat Seeds`).
+   - Plant, water, and harvest crops over 3 days.
+2. **Baking**:
 
-Spend coins to improve shop:
+   - Combine ingredients (e.g., `Strawberry + Milk + Wheat`) at the oven.
+   - Sell baked goods in your shop for coins!
 
-| Upgrade           | Cost | Effect                             |
-| ----------------- | ---- | ---------------------------------- |
-| Bigger Counter    | 500  | Hold 3 items at once               |
-| Cute Signage      | 750  | +10% sell price                    |
-| Ghost Acceptance™ | 1000 | Ghost customers arrive at night    |
-| Loyalty Card      | 1500 | Regular customers daily            |
-| Orders Board      | 2000 | Daily quest orders → bonus payouts |
+3. **Cow Care**:
 
-### 🏆 Baking Contest
+   - Feed cows daily to collect milk.
+   - Use the _Cow Flute_ to calm grumpy cows.
 
-- Occurs every few days in town square
-- Submit one item; judged on Taste, Presentation, Creativity
-- **Judges:**
-  - Baron Flan (fancy names)
-  - Loafilda (vegan)
-  - Glump the Ogre (burnt goods fan)
-  - Sir Meowster (only pink treats)
-- **Rewards:** Coins, Fame (↑shop traffic), Exclusive ingredients
+4. **Shop Management**:
 
-### 🥣 Items
+   - Buy low, sell high! Restock occurs every 5 minutes.
+   - Unlock upgrades like _Loyalty Cards_ and _Ghost Acceptance™_.
 
-Item ID | Name | Notes
-1 | Wheat Seeds | Plantable, used in baking
-2 | Strawberry Seeds | Plantable, used in baking
-3 | Watering Can | Needed for watering crops
-4 | Fertilizer | Speeds up growth
-10 | Wheat | From planted wheat seeds
-11 | Strawberry | From planted strawberries
-12 | Egg | From Chickens
-20 | Milk | Collected from cows
-21 | Butter | Processed from milk
-30 | Bread | Wheat-based
-31 | Strawberry Tart | Strawberry + Wheat
-32 | Strawberry Milk Cake | Strawberry + Milk + Wheat
-33 | Burnt Pie | Failed/incorrect recipe output
-34 | Experimental Jam | Crafted from gift combo
-40 | Eldermint Leaves | Needed for Berry's tea quest
-41 | Cow Flute | Calms angry cows
+5. **Quests**:
+   - Complete tasks (e.g., gather _Eldermint Leaves_) to progress the story.
+
+---
+
+## 🎮 Master the Keys - Control Cheat Sheet
+
+**Movement & Exploration**  
+🕹️ `WASD`/`Arrow Keys` – Move your character  
+🔍 `Z`/`X` – Zoom in/out to see details or the big picture
+
+**Quick Actions**  
+🎒 `I` – Open/close your **inventory** (manage seeds, tools, and goodies)  
+🏪 `B` – Toggle the **shop** (buy low, sell high!)  
+🏪 `E` – Interact with things
+⏸️ `ESC` – Pause game to access settings or save progress
+
+**Inventory Management**  
+🖱️ `Mouse Hover` – Preview item details in your inventory  
+✅ `Enter`/`Left Click` – Use selected item (plant seeds, water crops, play the cow flute!)  
+⬅️➡️ `Arrow Keys` – Navigate inventory slots when menu is open
+
+---
+
+## 📦 Your Pocket Universe - Item System Explained
+
+### 🛠️ Tools (Reusable forever!)
+
+⚒️ **Watering Can (ID:3)** - Hydrate crops daily  
+⚒️ **Hoe (ID:4)** - Till soil for planting  
+⚒️ **Axe (ID:5)** - Clear obstacles
+
+### 🌱 Seeds (Plant in tilled soil)
+
+🌾 **Wheat Seeds (ID:1)** - Grows in 3 days  
+🌾 **Strawberry Seeds (ID:2)** - Sweet profits!
+
+### 🍓 Crops (Harvest to bake/sell)
+
+🧺 **Wheat (ID:10)** - Base for bread  
+🧺 **Strawberry (ID:11)** - For tarts and cakes
+
+### 🥧 Baked Goods (Sell for $$$)
+
+🧁 **Bread (ID:30)** - Basic but reliable  
+🧁 **Strawberry Tart (ID:31)** - Customer favorite  
+🧁 **Burnt Pie (ID:33)** - Oops! Still sells to Glump the Ogre
+
+### 🐄 Special Items (Unlock secrets!)
+
+🎵 **Cow Flute (ID:41)** - Calms angry cows instantly  
+🍃 **Eldermint Leaves (ID:40)** - Quest item for Berry's tea
+
+---
+
+**Pro Tips:**  
+🔸 **Stack smart**: Seeds/crops stack in inventory (e.g. 5 Wheat Seeds = 1 slot)  
+🔹 **Experiment**: Try combos like 🍓+🥛+🌾 in oven for Strawberry Milk Cake!  
+🔻 **Quick sell**: "Experimental Jam (ID:34)" vanishes after use - sell it fast!
+
+---
+
+## 🖥️ Technical Details
+
+- **Engine**: Built with Go and Raylib for 2D rendering.
+- **Code Structure**:
+  - `main.go`: Core gameplay loop, rendering, and input handling.
+  - `inventory.go`: Inventory management and UI.
+  - `shop.go`: Buy/sell logic and shop interface.
+- **Assets**: Textures for items, tiles, and characters in `assets/`.
+
+---
+
+## 🙌 Credits
+
+- **Assets**:
+- **Music**:
+- **Inspiration**: Stardew Valley + Animal Crossing
+
+---
+
+## 📜 License
+
+MIT License. See [LICENSE](LICENSE) for details.

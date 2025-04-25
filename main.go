@@ -27,12 +27,12 @@ var (
 	fenceSprite  rl.Texture2D
 	tilledSprite rl.Texture2D
 	doorSprite   rl.Texture2D
-
-	tileDest   rl.Rectangle
-	tileSrc    rl.Rectangle
-	tileMap    []int
-	srcMap     []string
-	mapW, mapH int
+	wasOnMud     bool
+	tileDest     rl.Rectangle
+	tileSrc      rl.Rectangle
+	tileMap      []int
+	srcMap       []string
+	mapW, mapH   int
 
 	playerSprite                                  rl.Texture2D
 	playerSrc                                     rl.Rectangle
@@ -100,9 +100,14 @@ func drawScene() {
 		rl.DrawTexturePro(tex, tileSrc, tileDest,
 			rl.NewVector2(tileDest.Width, tileDest.Height), 0, rl.White)
 	}
-
-	rl.DrawTexturePro(playerSprite, playerSrc, playerDest,
-		rl.NewVector2(playerDest.Width, playerDest.Height), 0, rl.White)
+	rl.DrawTexturePro(
+		playerSprite,
+		playerSrc,
+		rl.NewRectangle(playerDest.X, playerDest.Y, 64, 64),
+		rl.NewVector2(32, 32),
+		0,
+		rl.White,
+	)
 }
 
 func drawPauseMenu() {
@@ -300,29 +305,111 @@ func input() {
 	}
 }
 
+func canMove(newX, newY float32) bool {
+	centerX := newX + playerDest.Width/2
+	centerY := newY + playerDest.Height/2
+
+	tileX := int(centerX / 16)
+	tileY := int(centerY / 16)
+
+	if tileX < 0 || tileX >= mapW || tileY < 0 || tileY >= mapH {
+		showMessages("You can't go beyond the map!")
+		return false
+	}
+
+	index := tileY*mapW + tileX
+	if index < 0 || index >= len(srcMap) {
+		return false
+	}
+
+	tileType := srcMap[index]
+	if isImpassable(tileType) {
+		switch tileType {
+		case "w":
+			showMessages("You can't walk in water!")
+		case "f":
+			showMessages("The fence blocks your path.")
+		case "h", "l":
+			showMessages("You can't walk through this.")
+		case "d":
+			showMessages("The door is closed.")
+		}
+		return false
+	}
+
+	return true
+}
+
+func isImpassable(tileType string) bool {
+	switch tileType {
+	case "w", "f", "h", "d", "l":
+		return true
+	default:
+		return false
+	}
+}
+
+func getCurrentTileTypes(x, y float32) []string {
+	playerRect := rl.Rectangle{
+		X:      x,
+		Y:      y,
+		Width:  playerDest.Width,
+		Height: playerDest.Height,
+	}
+
+	tileSize := float32(16)
+	startTileX := int(playerRect.X / tileSize)
+	endTileX := int((playerRect.X + playerRect.Width) / tileSize)
+	startTileY := int(playerRect.Y / tileSize)
+	endTileY := int((playerRect.Y + playerRect.Height) / tileSize)
+
+	var tiles []string
+	for y := startTileY; y <= endTileY; y++ {
+		for x := startTileX; x <= endTileX; x++ {
+			index := y*mapW + x
+			if index >= 0 && index < len(srcMap) {
+				tiles = append(tiles, srcMap[index])
+			}
+		}
+	}
+	return tiles
+}
+
 func update() {
 	running = !rl.WindowShouldClose()
 
 	playerSrc.X = playerSrc.Width * float32(playerFrame)
+	var dx, dy float32 = 0, 0
+
 	if playerMoving {
 		if playerUp {
-			playerDest.Y -= playerSpeed
+			dy -= playerSpeed
 		}
 		if playerDown {
-			playerDest.Y += playerSpeed
-		}
-		if playerRight {
-			playerDest.X += playerSpeed
+			dy += playerSpeed
 		}
 		if playerLeft {
-			playerDest.X -= playerSpeed
+			dx -= playerSpeed
 		}
+		if playerRight {
+			dx += playerSpeed
+		}
+
+		proposedX := playerDest.X + dx
+		proposedY := playerDest.Y + dy
+
+		if canMove(proposedX, proposedY) {
+			playerDest.X = proposedX
+			playerDest.Y = proposedY
+		}
+
 		if frameCount%8 == 1 {
 			playerFrame++
 		}
 	} else if frameCount%45 == 1 {
 		playerFrame++
 	}
+
 	frameCount++
 	if playerFrame > 3 {
 		playerFrame = 0
@@ -332,6 +419,19 @@ func update() {
 	}
 	playerSrc.X = playerSrc.Width * float32(playerFrame)
 	playerSrc.Y = playerSrc.Height * float32(playerDir)
+
+	currentTileTypes := getCurrentTileTypes(playerDest.X, playerDest.Y)
+	onMud := false
+	for _, t := range currentTileTypes {
+		if t == "t" {
+			onMud = true
+			break
+		}
+	}
+	if onMud && !wasOnMud {
+		showMessages("You slip in the mud!")
+	}
+	wasOnMud = onMud
 
 	rl.UpdateMusicStream(music)
 	if musicPaused {
@@ -474,8 +574,8 @@ func init() {
 
 	playerSprite = rl.LoadTexture("assets/Characters/BasicCharakterSpritesheet.png")
 	playerSrc = rl.NewRectangle(0, 0, 48, 48)
-	playerDest = rl.NewRectangle(200, 200, 100, 100)
 
+	playerDest = rl.NewRectangle(200, 200, 32, 32)
 	playerInv = Inventory{Open: false, Cursor: 0, HoveredSlot: -1}
 	playerInv.Slots[0] = InventorySlot{ItemID: 3, ItemName: Items[3].Name, ItemReusable: true}                     // Watering Can
 	playerInv.Slots[1] = InventorySlot{ItemID: 4, ItemName: Items[4].Name, ItemReusable: true}                     // Hoe
