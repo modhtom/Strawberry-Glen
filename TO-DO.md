@@ -11,21 +11,20 @@ Rapidly mock up core interaction (walking, planting, harvesting).
 Finalize tile‐collision metadata (walkable, impassable, interactive) --DONE--
 and responses (e.g., “You can’t walk in water!” or slipping in mud). --DONE--
 
-Build a semantic map layer (object entities, crops, shop counters) separate from rendering layer.
+Build a semantic map layer (object entities, crops, shop counters) separate from rendering layer. --DONE--
 
-Time & Progression System
-Implement day/night cycle,
-growth timers,
-bake queues,
+Time & Progression System --DONE--
+Implement day/night cycle, --DONE--
+growth timers, --DONE--
+bake queues,--DONE--
 and scheduling for NPC routines.
 
 Game Loops
-Farming loop: Plant → water → grow → harvest → store/sell.
-Baking loop: Ingredient input → recipe process → finished goods → sell.
+Farming loop: Plant → water → grow → harvest → store/sell. --DONE--
+Baking loop: Ingredient input → recipe process → finished goods → sell. --DONE--
 Economy & Progression: Cashflow, unlocks (new seeds, recipes, upgrades).
 
-Interaction System
-Contextual “use” key (e.g., ‘E’) for talking, picking, planting, opening shop.
+Interaction System “use” key (‘E’) for talking, picking, planting, opening shop. --DONE--
 
 3. Asset Pipeline Art & Animation
 
@@ -34,7 +33,7 @@ Curate SFX for footsteps, planting, vending; BGM for day, night, shop ambience.
 Set up audio manager (volume settings, mute toggle, layering).
 
 Art
-Fix Items textures
+Fix Items textures , shop Desk and crops
 
 4. User Interface & UX HUD & Menus --DONE--
 

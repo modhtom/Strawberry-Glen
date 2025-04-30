@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -26,7 +27,7 @@ var shopItems = []ShopItem{
 	{ID: 1, PriceBuy: 5, PriceSell: 2, Stock: 10},   // Wheat Seeds
 	{ID: 10, PriceBuy: 20, PriceSell: 8, Stock: 5},  // Wheat
 	{ID: 11, PriceBuy: 25, PriceSell: 10, Stock: 5}, // Strawberry
-	// add more
+	//TODO: add more
 }
 
 func findInventorySlot(id int) (*InventorySlot, bool) {
@@ -38,20 +39,99 @@ func findInventorySlot(id int) (*InventorySlot, bool) {
 	return nil, false
 }
 
-func addToInventory(id int, name string, reusable bool, qty int) bool {
-	for i := range playerInv.Slots {
-		if playerInv.Slots[i].ItemID == 0 {
-			playerInv.Slots[i] = InventorySlot{
-				ItemID:       id,
-				ItemName:     name,
-				ItemReusable: reusable,
-				ItemQuantity: qty,
+func addToInventory(id int, name string, reusable bool, qtyToAdd int) bool {
+	itemData, ok := Items[id]
+	if !ok {
+		fmt.Printf("Warning: Trying to add unknown item ID %d\n", id)
+		return false
+	}
+
+	maxStack := itemData.MaxStack
+	isStackable := !reusable && maxStack > 1
+
+	addedSuccessfully := false
+	remainingQty := qtyToAdd
+
+	if isStackable {
+		for i := range playerInv.Slots {
+			slot := &playerInv.Slots[i]
+			if slot.ItemID == id && slot.ItemQuantity < maxStack {
+				canAdd := maxStack - slot.ItemQuantity
+				addAmount := 0
+				if remainingQty <= canAdd {
+					addAmount = remainingQty
+				} else {
+					addAmount = canAdd
+				}
+
+				slot.ItemQuantity += addAmount
+				remainingQty -= addAmount
+				addedSuccessfully = true
+				fmt.Printf("Added %d to existing stack of %s (Slot %d). New Qty: %d. Remaining to Add: %d\n", addAmount, name, i, slot.ItemQuantity, remainingQty)
+
+				if remainingQty <= 0 {
+					return true
+				}
 			}
-			return true
 		}
 	}
-	showMessages("There is no room left in your Inventory.")
-	return false
+
+	if remainingQty > 0 {
+		for i := range playerInv.Slots {
+			slot := &playerInv.Slots[i]
+			if slot.ItemID == 0 {
+				addAmount := 0
+				if isStackable {
+					if remainingQty <= maxStack {
+						addAmount = remainingQty
+					} else {
+						addAmount = maxStack
+					}
+				} else {
+					if remainingQty > 0 {
+						addAmount = 1
+					} else {
+						addAmount = 0
+					}
+				}
+
+				if addAmount > 0 {
+					slot.ItemID = id
+					slot.ItemName = name
+					slot.ItemReusable = reusable
+					slot.ItemQuantity = addAmount
+					remainingQty -= addAmount
+					addedSuccessfully = true
+					fmt.Printf("Added %d %s to new slot %d. Remaining to Add: %d\n", addAmount, name, i, remainingQty)
+
+					if remainingQty <= 0 {
+						return true
+					}
+
+					if !isStackable {
+						return true
+					}
+
+				} else {
+					// This case shouldn't be reached if remainingQty > 0, but safety break
+					break
+				}
+
+			}
+		}
+	}
+
+	if !addedSuccessfully {
+		showMessages("Inventory full! Cannot add "+name+".", 1.0)
+		return false
+	}
+
+	if remainingQty > 0 {
+		showMessages(fmt.Sprintf("Inventory full! Could not add %d %s.", remainingQty, name), 1.0)
+		return true
+	}
+
+	return true
 }
 
 func drawShop() {

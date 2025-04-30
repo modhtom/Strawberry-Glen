@@ -30,11 +30,19 @@ type Inventory struct {
 }
 
 type ItemData struct {
-	ID          int
-	Name        string
-	Category    string
-	IsPlantable bool
-	IsEdible    bool
+	ID             int
+	Name           string
+	Category       string
+	IsPlantable    bool
+	IsEdible       bool
+	GrowsIntoID    int
+	GrowthStages   int
+	TimePerStage   float32
+	HarvestYield   int
+	RequiresTilled bool
+	MaxStack       int
+	SeedTexture    rl.Texture2D
+	PlantTexture   rl.Texture2D
 }
 
 type ItemSprite struct {
@@ -43,23 +51,28 @@ type ItemSprite struct {
 }
 
 var Items = map[int]ItemData{
-	1:  {ID: 1, Name: "Wheat Seeds", Category: "seed", IsPlantable: true},
-	2:  {ID: 2, Name: "Strawberry Seeds", Category: "seed", IsPlantable: true},
-	3:  {ID: 3, Name: "Watering Can", Category: "tool"},
-	4:  {ID: 4, Name: "Hoe", Category: "tool"},
-	5:  {ID: 5, Name: "Axe", Category: "tool"},
-	10: {ID: 10, Name: "Wheat", Category: "crop"},
-	11: {ID: 11, Name: "Strawberry", Category: "crop", IsEdible: true},
-	20: {ID: 20, Name: "Milk", Category: "animal", IsEdible: true},
-	21: {ID: 21, Name: "Butter", Category: "animal", IsEdible: true},
-	22: {ID: 22, Name: "Egg", Category: "animal", IsEdible: true},
-	30: {ID: 30, Name: "Bread", Category: "baked", IsEdible: true},
-	31: {ID: 31, Name: "Strawberry Tart", Category: "baked", IsEdible: true},
-	32: {ID: 32, Name: "Strawberry Milk Cake", Category: "baked", IsEdible: true},
-	33: {ID: 33, Name: "Burnt Pie", Category: "baked", IsEdible: true},
-	34: {ID: 34, Name: "Experimental Jam", Category: "baked", IsEdible: true},
-	40: {ID: 40, Name: "Eldermint Leaves", Category: "quest"},
-	41: {ID: 41, Name: "Cow Flute", Category: "quest"},
+	1: {ID: 1, Name: "Wheat Seeds", Category: "seed", IsPlantable: true, GrowsIntoID: 10, GrowthStages: 4, TimePerStage: 15.0, HarvestYield: 1, RequiresTilled: true, MaxStack: 99},
+	2: {ID: 2, Name: "Strawberry Seeds", Category: "seed", IsPlantable: true, GrowsIntoID: 11, GrowthStages: 4, TimePerStage: 20.0, HarvestYield: 2, RequiresTilled: true, MaxStack: 99},
+
+	3: {ID: 3, Name: "Watering Can", Category: "tool"},
+	4: {ID: 4, Name: "Hoe", Category: "tool"},
+	5: {ID: 5, Name: "Axe", Category: "tool"},
+
+	10: {ID: 10, Name: "Wheat", Category: "crop", MaxStack: 99},
+	11: {ID: 11, Name: "Strawberry", Category: "crop", IsEdible: true, MaxStack: 99},
+
+	20: {ID: 20, Name: "Milk", Category: "animal", IsEdible: true, MaxStack: 99},
+	21: {ID: 21, Name: "Butter", Category: "animal", IsEdible: true, MaxStack: 99},
+	22: {ID: 22, Name: "Egg", Category: "animal", IsEdible: true, MaxStack: 99},
+
+	30: {ID: 30, Name: "Bread", Category: "baked", IsEdible: true, MaxStack: 99},
+	31: {ID: 31, Name: "Strawberry Tart", Category: "baked", IsEdible: true, MaxStack: 99},
+	32: {ID: 32, Name: "Strawberry Milk Cake", Category: "baked", IsEdible: true, MaxStack: 99},
+	33: {ID: 33, Name: "Burnt Pie", Category: "baked", IsEdible: true, MaxStack: 99},
+	34: {ID: 34, Name: "Experimental Jam", Category: "baked", IsEdible: true, MaxStack: 99},
+
+	40: {ID: 40, Name: "Eldermint Leaves", Category: "quest", MaxStack: 99},
+	41: {ID: 41, Name: "Cow Flute", Category: "quest", MaxStack: 99},
 }
 
 func drawInventory() {
@@ -98,26 +111,56 @@ func drawInventory() {
 func useInventoryItem(idx int) {
 	slot := &playerInv.Slots[idx]
 	if slot.ItemID == 0 {
-		showMessages("Nothing to use here!")
+		showMessages("Nothing to use here!", 0.5)
 		return
 	}
 
-	switch slot.ItemID {
-	case 1:
-		showMessages("You swing the " + slot.ItemName + "!")
-	default:
-		showMessages("Used " + slot.ItemName)
+	itemData, ok := Items[slot.ItemID]
+	if !ok {
+		showMessages("Unknown item!", 0.5)
+		return
 	}
-	if !(slot.ItemReusable) {
-		if (slot.ItemQuantity - 1) == 0 {
-			slot.ItemQuantity = 0
+
+	if itemData.Category == "tool" {
+		switch itemData.ID {
+		case 4: // Hoe
+			tryTillSoil()
+		case 3: // Watering Can
+			tryWaterCrop()
+		default:
+			showMessages("Used "+slot.ItemName, 0.5)
+		}
+		return
+	}
+
+	if itemData.IsPlantable {
+		planted := tryPlantSeed(itemData)
+		if planted {
+			showMessages("Planted "+slot.ItemName, 0.5)
+			slot.ItemQuantity--
+			if slot.ItemQuantity == 0 {
+				slot.ItemID = 0
+				slot.ItemName = ""
+				slot.ItemReusable = false
+			}
+		} else {
+			showMessages("Can't Planted "+slot.ItemName, 0.5)
+		}
+		return
+	}
+
+	showMessages("Used "+slot.ItemName, 0.5)
+	if !slot.ItemReusable {
+		slot.ItemQuantity--
+		if slot.ItemQuantity == 0 {
 			slot.ItemID = 0
 			slot.ItemName = ""
+			slot.ItemReusable = false
 		} else {
-			slot.ItemQuantity -= 1
-			showMessages(fmt.Sprintf("%s left %d", slot.ItemName, slot.ItemQuantity))
+			showMessages(fmt.Sprintf("%s left: %d", slot.ItemName, slot.ItemQuantity), 0.5)
 		}
 	}
+
 }
 
 func loadItemSprites() {
