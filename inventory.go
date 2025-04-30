@@ -6,13 +6,9 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-const (
-	InventorySize = 5
-	pickupRadius  = 20.0
-)
-
 var (
-	itemSprites map[int]ItemSprite
+	InventorySize = 7
+	itemSprites   map[int]ItemSprite
 )
 
 type InventorySlot struct {
@@ -23,7 +19,7 @@ type InventorySlot struct {
 }
 
 type Inventory struct {
-	Slots       [InventorySize]InventorySlot
+	Slots       []InventorySlot
 	Open        bool
 	Cursor      int
 	HoveredSlot int
@@ -57,13 +53,14 @@ var Items = map[int]ItemData{
 	3: {ID: 3, Name: "Watering Can", Category: "tool"},
 	4: {ID: 4, Name: "Hoe", Category: "tool"},
 	5: {ID: 5, Name: "Axe", Category: "tool"},
+	6: {ID: 6, Name: "Milking Bucket", Category: "tool"},
 
 	10: {ID: 10, Name: "Wheat", Category: "crop", MaxStack: 99},
 	11: {ID: 11, Name: "Strawberry", Category: "crop", IsEdible: true, MaxStack: 99},
 
-	20: {ID: 20, Name: "Milk", Category: "animal", IsEdible: true, MaxStack: 99},
-	21: {ID: 21, Name: "Butter", Category: "animal", IsEdible: true, MaxStack: 99},
-	22: {ID: 22, Name: "Egg", Category: "animal", IsEdible: true, MaxStack: 99},
+	20: {ID: 20, Name: "Milk", Category: "dairy", IsEdible: true, MaxStack: 99},
+	21: {ID: 21, Name: "Butter", Category: "dairy", IsEdible: true, MaxStack: 99},
+	22: {ID: 22, Name: "Egg", Category: "poultry", IsEdible: true, MaxStack: 99},
 
 	30: {ID: 30, Name: "Bread", Category: "baked", IsEdible: true, MaxStack: 99},
 	31: {ID: 31, Name: "Strawberry Tart", Category: "baked", IsEdible: true, MaxStack: 99},
@@ -75,9 +72,18 @@ var Items = map[int]ItemData{
 	41: {ID: 41, Name: "Cow Flute", Category: "quest", MaxStack: 99},
 }
 
+func applyUpgrades() {
+	if progression.ActiveUpgrades["LargeBackpack"] && len(playerInv.Slots) < 7 {
+		newSlots := make([]InventorySlot, 7)
+		copy(newSlots, playerInv.Slots)
+		playerInv.Slots = newSlots
+	}
+}
+
 func drawInventory() {
+	slotCount := len(playerInv.Slots)
 	rl.DrawRectangle(50, 50, screenWidth-100, 100, rl.NewColor(0, 0, 0, 180))
-	slotWidth := float32((screenWidth - 100) / InventorySize)
+	slotWidth := float32((screenWidth - 100) / slotCount)
 	y := float32(60)
 	for i := range InventorySize {
 		x := 50 + slotWidth*float32(i)
@@ -169,14 +175,15 @@ func loadItemSprites() {
 	milk := rl.LoadTexture("assets/Objects/Simple_Milk_and_grass_item.png")
 
 	itemSprites = map[int]ItemSprite{
-		1:  {plants, rl.NewRectangle(0, 0, 16, 16)},  // Wheat Seeds
-		2:  {plants, rl.NewRectangle(7, 0, 16, 16)},  // Strawberry Seeds
-		3:  {tools, rl.NewRectangle(0, 0, 16, 16)},   // Watering Can
-		4:  {tools, rl.NewRectangle(13, 0, 16, 16)},  // Hoe
-		5:  {tools, rl.NewRectangle(37, 0, 16, 16)},  // Axe
-		10: {plants, rl.NewRectangle(6, 0, 16, 16)},  // Wheat
-		11: {plants, rl.NewRectangle(26, 0, 16, 16)}, // Strawberry
-		20: {milk, rl.NewRectangle(3, 0, 16, 16)},    // Milk
+		1:  {plants, rl.NewRectangle(0, 0, 16, 16)},                                                          // Wheat Seeds
+		2:  {plants, rl.NewRectangle(7, 0, 16, 16)},                                                          // Strawberry Seeds
+		3:  {tools, rl.NewRectangle(0, 0, 16, 16)},                                                           // Watering Can
+		4:  {tools, rl.NewRectangle(13, 0, 16, 16)},                                                          // Hoe
+		5:  {tools, rl.NewRectangle(37, 0, 16, 16)},                                                          // Axe
+		6:  {tools, rl.NewRectangle(37, 0, 16, 16)},                                                          // Milk Bucket
+		10: {rl.LoadTexture("assets/Objects/Simple_Milk_and_grass_item.png"), rl.NewRectangle(0, 0, 16, 16)}, // Wheat
+		11: {plants, rl.NewRectangle(26, 0, 16, 16)},                                                         // Strawberry
+		20: {milk, rl.NewRectangle(3, 0, 16, 16)},                                                            // Milk
 		21: {rl.LoadTexture("assets/Objects/Butter.png"), rl.NewRectangle(0, 0, 16, 16)},
 		22: {rl.LoadTexture("assets/Objects/Egg_item.png"), rl.NewRectangle(0, 0, 16, 16)},
 		30: {rl.LoadTexture("assets/Objects/Bread.png"), rl.NewRectangle(0, 0, 16, 16)},

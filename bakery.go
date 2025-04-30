@@ -24,14 +24,15 @@ type bakeryItem struct {
 }
 
 var bakeryItems = []bakeryItem{
-	{ID: 30, PriceBuy: 50, PriceSell: 12, Stock: 10},    // Bread
-	{ID: 31, PriceBuy: 40, PriceSell: 18, Stock: 5},     // Strawberry Tart
-	{ID: 32, PriceBuy: 85, PriceSell: 40, Stock: 5},     // Strawberry Milk Cake
-	{ID: 33, PriceBuy: 95, PriceSell: 30, Stock: 5},     // Burnt Pie
-	{ID: 34, PriceBuy: 65, PriceSell: 25, Stock: 5},     // Experimental Jam
-	{ID: 40, PriceBuy: 5000, PriceSell: 200, Stock: 10}, // Eldermint Leaves
-	{ID: 10, PriceBuy: 5000, PriceSell: 200, Stock: 10}, // Cow Flute
+	{ID: 30, PriceBuy: 25, PriceSell: 12, Stock: 15}, // Bread (needs 1 Wheat)
+	{ID: 31, PriceBuy: 40, PriceSell: 18, Stock: 15}, // Strawberry Tart
 
+	{ID: 32, PriceBuy: 85, PriceSell: 40, Stock: 5}, // Strawberry Milk Cake
+	{ID: 33, PriceBuy: 10, PriceSell: 5, Stock: 5},  // Burnt Pie (punishment)
+	{ID: 34, PriceBuy: 45, PriceSell: 17, Stock: 5}, // Experimental Jam
+
+	{ID: 40, PriceBuy: 200, PriceSell: 80, Stock: 1},  // Eldermint
+	{ID: 41, PriceBuy: 300, PriceSell: 150, Stock: 1}, // Cow Flute
 }
 
 type Recipe struct {

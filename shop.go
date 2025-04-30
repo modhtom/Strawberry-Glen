@@ -21,13 +21,24 @@ type ShopItem struct {
 	PriceBuy  int
 	PriceSell int
 	Stock     int
+	Unlocked  bool
 }
 
 var shopItems = []ShopItem{
-	{ID: 1, PriceBuy: 5, PriceSell: 2, Stock: 10},   // Wheat Seeds
-	{ID: 10, PriceBuy: 20, PriceSell: 8, Stock: 5},  // Wheat
-	{ID: 11, PriceBuy: 25, PriceSell: 10, Stock: 5}, // Strawberry
-	//TODO: add more
+	{ID: 1, PriceBuy: 5, PriceSell: 2, Stock: 10, Unlocked: true},
+	{ID: 2, PriceBuy: 8, PriceSell: 3, Stock: 5, Unlocked: false},
+	{ID: 10, PriceBuy: 20, PriceSell: 8, Stock: 5, Unlocked: true},
+	{ID: 40, PriceBuy: 100, PriceSell: 40, Stock: 3, Unlocked: false},
+}
+
+func getAvailableShopItems() []*ShopItem {
+	var available []*ShopItem
+	for i := range shopItems {
+		if shopItems[i].Unlocked || progression.UnlockedSeeds[shopItems[i].ID] {
+			available = append(available, &shopItems[i])
+		}
+	}
+	return available
 }
 
 func findInventorySlot(id int) (*InventorySlot, bool) {
@@ -142,28 +153,23 @@ func drawShop() {
 	rl.DrawText(fmt.Sprintf("SHOP — Gold: %d", playerGold), int32(x+20), int32(y+20), 20, rl.White)
 	modeText := []string{"[Buy]", "[Sell]"}[shopMode]
 	rl.DrawText(modeText, int32(x+300), int32(y+20), 20, rl.Yellow)
-	for i, it := range shopItems {
+
+	availableItems := getAvailableShopItems()
+	for i, it := range availableItems {
 		ty := int32(int(y) + 60 + 24*i)
 		name := Items[it.ID].Name
 		price := it.PriceBuy
 		if shopMode == 1 {
 			price = it.PriceSell
 		}
-		stock := it.Stock
-		if shopMode == 1 {
-			if slot, ok := findInventorySlot(it.ID); ok {
-				stock = slot.ItemQuantity
-			} else {
-				stock = 0
-			}
-		}
 		color := rl.White
 		if i == shopCursor {
 			color = rl.Yellow
 		}
-		rl.DrawText(fmt.Sprintf("%-15s %3dG  Stock:%2d", name, price, stock),
+		rl.DrawText(fmt.Sprintf("%-15s %3dG  Stock:%2d", name, price, it.Stock),
 			int32(x+20), ty, 20, color)
 	}
+
 	rl.DrawText("left arrow/right arrow Switch Buy/Sell.", int32(x+20), int32(y+h-40), 16, rl.LightGray)
 	rl.DrawText("Use 'B' to close the shop.", int32(x+20), int32(y+h-20), 16, rl.LightGray)
 }

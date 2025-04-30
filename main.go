@@ -39,6 +39,9 @@ var (
 	srcMap       []string
 	mapW, mapH   int
 
+	// cowSprite     rl.Texture2D
+	// chickenSprite rl.Texture2D
+
 	playerSprite                                  rl.Texture2D
 	playerSrc                                     rl.Rectangle
 	playerDest                                    rl.Rectangle
@@ -72,6 +75,11 @@ var (
 
 	world World
 )
+
+func addGold(amount int) {
+	playerGold += amount
+	progression.TotalGoldEarned += amount
+}
 
 func input() {
 	if rl.IsKeyPressed(rl.KeyEscape) {
@@ -126,7 +134,7 @@ func input() {
 			bakeryCursor = 0
 			bakeryMode = 0
 		} else {
-			showMessages("You need to be at the shop counter!", 1.0)
+			showMessages("You need to be at a counter!", 1.0)
 		}
 	}
 
@@ -146,6 +154,7 @@ func input() {
 			switch shopMode {
 			case 0: // BUY
 				if playerGold >= item.PriceBuy && item.Stock > 0 {
+					addGold(-item.PriceBuy)
 					playerGold -= item.PriceBuy
 					item.Stock--
 					if found {
@@ -159,6 +168,7 @@ func input() {
 				}
 			case 1: // SELL
 				if found && slot.ItemQuantity > 0 {
+					addGold(item.PriceSell)
 					playerGold += item.PriceSell
 					item.Stock++
 					slot.ItemQuantity--
@@ -166,6 +176,7 @@ func input() {
 						slot.ItemID = 0
 						slot.ItemName = ""
 					}
+					progression.ItemsSold++
 				}
 			}
 		}
@@ -386,6 +397,13 @@ func update() {
 		numberOfDays++
 	}
 
+	if timeOfDay >= dayDuration {
+		progression.DaysPlayed++
+	}
+
+	applyUpgrades()
+	checkProgression()
+
 	cam.Target = rl.NewVector2(float32(playerDest.X-(playerDest.Width/2)),
 		float32(playerDest.Y-(playerDest.Height/2)))
 
@@ -464,14 +482,35 @@ func init() {
 	tileDest = rl.NewRectangle(0, 0, 16, 16)
 	tileSrc = rl.NewRectangle(0, 0, 16, 16)
 
+	// cowSprite = rl.LoadTexture("assets/Characters/FreeCowSprites.png")
+	// chickenSprite = rl.LoadTexture("assets/Characters/FreeChickenSprites.png")
+	// world.Animals = []*Animal{
+	// 	{
+	// 		Type:     "cow",
+	// 		Position: Vector2{X: 6, Y: 3},
+	// 		Texture:  cowSprite,
+	// 	},
+	// 	{
+	// 		Type:     "chicken",
+	// 		Position: Vector2{X: 9, Y: 3},
+	// 		Texture:  chickenSprite,
+	// 	},
+	// }
+
 	playerSprite = rl.LoadTexture("assets/Characters/BasicCharakterSpritesheet.png")
 	playerSrc = rl.NewRectangle(0, 0, 48, 48)
 
 	playerDest = rl.NewRectangle(200, 200, 32, 32)
-	playerInv = Inventory{Open: false, Cursor: 0, HoveredSlot: -1}
-	playerInv.Slots[0] = InventorySlot{ItemID: 3, ItemName: Items[3].Name, ItemReusable: true} // Watering Can
-	playerInv.Slots[1] = InventorySlot{ItemID: 4, ItemName: Items[4].Name, ItemReusable: true} // Hoe
-	playerInv.Slots[2] = InventorySlot{ItemID: 5, ItemName: Items[5].Name, ItemReusable: true} // Axe
+	playerInv = Inventory{
+		Open:        false,
+		Cursor:      0,
+		HoveredSlot: -1,
+		Slots:       make([]InventorySlot, InventorySize),
+	}
+	playerInv.Slots[0] = InventorySlot{ItemID: 3, ItemName: Items[3].Name, ItemReusable: true}
+	playerInv.Slots[1] = InventorySlot{ItemID: 4, ItemName: Items[4].Name, ItemReusable: true}
+	playerInv.Slots[2] = InventorySlot{ItemID: 5, ItemName: Items[5].Name, ItemReusable: true}
+	playerInv.Slots[3] = InventorySlot{ItemID: 6, ItemName: Items[6].Name, ItemReusable: true}
 
 	rl.InitAudioDevice()
 	music = rl.LoadMusicStream("assets/audio/amb.mp3")

@@ -161,6 +161,18 @@ func tryWaterCrop() {
 func tryInteract() {
 	tileX, tileY := getFacingTilePos()
 
+	// for _, a := range world.Animals {
+	// 	if a.Position.X == tileX && a.Position.Y == tileY {
+	// 		switch a.Type {
+	// 		case "cow":
+	// 			tryMilkCow(a.Position)
+	// 		case "chicken":
+	// 			tryCollectEgg(a.Position)
+	// 		}
+	// 		return
+	// 	}
+	// }
+
 	crop := world.GetCropAt(tileX, tileY)
 	if crop != nil && crop.IsHarvestable() {
 		harvestCrop(crop)
@@ -236,4 +248,5 @@ func harvestCrop(crop *Crop) {
 	} else {
 		showMessages("Inventory full! Cannot harvest "+harvestItemData.Name+".", 1.0)
 	}
+	progression.CropsHarvested++
 }
