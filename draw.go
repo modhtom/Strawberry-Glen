@@ -37,10 +37,14 @@ func drawScene() {
 			tex = shopSprite
 		case "b":
 			tex = bakerySprite
+		case "c":
+			tex = chickenHouseSprite
+		case "0":
+			tex = cowSprite
 		default:
 			tex = grassSprite
 		}
-		if srcMap[i] == "h" || srcMap[i] == "d" || srcMap[i] == "f" || srcMap[i] == "s" || srcMap[i] == "b" {
+		if srcMap[i] == "h" || srcMap[i] == "d" || srcMap[i] == "f" || srcMap[i] == "s" || srcMap[i] == "b" || srcMap[i] == "c" || srcMap[i] == "o" {
 			tileSrc.X = 10
 			tileSrc.Y = 25
 			rl.DrawTexturePro(grassSprite, tileSrc, tileDest,
@@ -54,35 +58,23 @@ func drawScene() {
 			rl.NewVector2(tileDest.Width, tileDest.Height), 0, rl.White)
 	}
 
-	for _, animal := range world.Animals {
-		animalDest := rl.NewRectangle(
-			float32(animal.Position.X)*tileDest.Width,
-			float32(animal.Position.Y)*tileDest.Height,
-			tileDest.Width,
-			tileDest.Height,
-		)
+	// for _, animal := range world.Animals {
+	// 	animalDest := rl.NewRectangle(
+	// 		float32(animal.Position.X)*tileDest.Width,
+	// 		float32(animal.Position.Y)*tileDest.Height,
+	// 		tileDest.Width,
+	// 		tileDest.Height,
+	// 	)
 
-		var src rl.Rectangle
-		switch animal.Type {
-		case "cow":
-			src = rl.NewRectangle(80, 0, 16, 16)
-		case "chicken":
-			src = rl.NewRectangle(96, 0, 16, 16)
-		}
+	// 	var src rl.Rectangle
+	// 	switch animal.Type {
+	// 	case "cow":
+	// 		src = rl.NewRectangle(0, 0, 16, 16)
+	// 	}
 
-		rl.DrawTexturePro(animal.Texture, src, animalDest,
-			rl.NewVector2(0, 0), 0, rl.White)
-
-		// Show egg indicator
-		if animal.Type == "chicken" && animal.HasEgg {
-			rl.DrawCircle(
-				int32(animalDest.X+animalDest.Width-4),
-				int32(animalDest.Y+4),
-				3,
-				rl.Yellow,
-			)
-		}
-	}
+	// 	rl.DrawTexturePro(animal.Texture, src, animalDest,
+	// 		rl.NewVector2(0, 0), 0, rl.White)
+	// }
 
 	for _, crop := range world.Crops {
 		if crop != nil {

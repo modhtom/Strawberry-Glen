@@ -4,18 +4,33 @@ import (
 	"fmt"
 	"math"
 	"time"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type World struct {
-	MapWidth         int
-	MapHeight        int
-	Tiles            []string
-	Entities         []Entity
-	Crops            []*Crop
-	Objects          []*GameObject
-	LastUpdate       time.Time
-	ShopCounterPos   Vector2
-	bakeryCounterPos Vector2
+	MapWidth          int
+	MapHeight         int
+	Tiles             []string
+	Entities          []Entity
+	Crops             []*Crop
+	Objects           []*GameObject
+	LastUpdate        time.Time
+	ShopCounterPos    Vector2
+	bakeryCounterPos  Vector2
+	Animals           []*Animal
+	ChickenHousePos   Vector2
+	LastEggCollection time.Time
+	EggCooldown       time.Duration
+	EggsAvailable     int
+}
+
+type Animal struct {
+	Type       string
+	Position   Vector2
+	Texture    rl.Texture2D
+	LastMilked time.Time
+	HasMilk    bool
 }
 
 type Entity struct {
@@ -38,6 +53,7 @@ func (w *World) Init(mapWidth, mapHeight int, tiles []string) {
 	w.MapWidth = mapWidth
 	w.MapHeight = mapHeight
 	w.Tiles = tiles
+
 	w.LastUpdate = time.Now()
 }
 
@@ -69,6 +85,17 @@ func (w *World) InitShopCounter() {
 	})
 }
 
+func (w *World) InitCows() {
+	w.Animals = []*Animal{
+		{
+			Type:       "cow",
+			Position:   Vector2{X: 2, Y: 3},
+			Texture:    cowSprite,
+			LastMilked: time.Now().Add(-1 * time.Hour),
+		},
+	}
+}
+
 func (w *World) InitbakeryCounter() {
 	w.bakeryCounterPos = Vector2{X: 23, Y: 7}
 	w.AddObject(&GameObject{
@@ -76,6 +103,18 @@ func (w *World) InitbakeryCounter() {
 		Position: w.bakeryCounterPos,
 		Active:   true,
 	})
+}
+
+func (w *World) InitChickenHouse() {
+	w.ChickenHousePos = Vector2{X: 23, Y: 4}
+	w.AddObject(&GameObject{
+		Type:     "ChickenHouse",
+		Position: w.ChickenHousePos,
+		Active:   true,
+	})
+	w.EggsAvailable = 3
+	w.EggCooldown = 2 * time.Minute
+	w.LastEggCollection = time.Now().Add(-w.EggCooldown)
 }
 
 func (w *World) Update() {

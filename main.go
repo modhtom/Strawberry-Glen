@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"time"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -23,6 +24,9 @@ var (
 	wheatGrowthSprite      rl.Texture2D
 	strawberryGrowthSprite rl.Texture2D
 
+	cowSprite          rl.Texture2D
+	chickenHouseSprite rl.Texture2D
+
 	grassSprite  rl.Texture2D
 	houseSprite  rl.Texture2D
 	shopSprite   rl.Texture2D
@@ -38,9 +42,6 @@ var (
 	tileMap      []int
 	srcMap       []string
 	mapW, mapH   int
-
-	// cowSprite     rl.Texture2D
-	// chickenSprite rl.Texture2D
 
 	playerSprite                                  rl.Texture2D
 	playerSrc                                     rl.Rectangle
@@ -133,8 +134,28 @@ func input() {
 			bakeryOpen = !bakeryOpen
 			bakeryCursor = 0
 			bakeryMode = 0
+		} else if isPlayerNearChickenHouse() {
+			if time.Since(world.LastEggCollection) < world.EggCooldown {
+				remaining := world.EggCooldown - time.Since(world.LastEggCollection)
+				showMessages(fmt.Sprintf("Chickens resting! Come back in %0.1f minutes.",
+					remaining.Minutes()), 2.0)
+				return
+			}
+
+			if world.EggsAvailable <= 0 {
+				showMessages("No eggs available - check back later!", 2.0)
+				return
+			}
+
+			if added := addToInventory(22, "Egg", false, 1); added {
+				world.EggsAvailable--
+				showMessages(fmt.Sprintf("Collected egg! %d remaining.", world.EggsAvailable), 1.5)
+				world.LastEggCollection = time.Now()
+			} else {
+				showMessages("Inventory full - make space for eggs!", 1.5)
+			}
 		} else {
-			showMessages("You need to be at a counter!", 1.0)
+			showMessages("You need to be at a counter!", 0.4)
 		}
 	}
 
@@ -274,6 +295,54 @@ func input() {
 			cam.Zoom = 1.0
 		} else {
 			cam.Zoom -= 0.5
+		}
+	}
+}
+
+func isPlayerNearChickenHouse() bool {
+	playerTileX := int((playerDest.X + playerDest.Width/2) / tileDest.Width)
+	playerTileY := int((playerDest.Y + playerDest.Height/2) / tileDest.Height)
+
+	return math.Abs(float64(playerTileX-world.ChickenHousePos.X)) <= 1 &&
+		math.Abs(float64(playerTileY-world.ChickenHousePos.Y)) <= 1
+}
+
+func isPlayerNearCow() bool {
+	playerTileX := int((playerDest.X + playerDest.Width/2) / tileDest.Width)
+	playerTileY := int((playerDest.Y + playerDest.Height/2) / tileDest.Height)
+
+	for _, animal := range world.Animals {
+		if animal.Type == "cow" {
+			if math.Abs(float64(playerTileX-animal.Position.X)) <= 1 &&
+				math.Abs(float64(playerTileY-animal.Position.Y)) <= 1 {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func tryMilkCow() {
+	if !isPlayerNearCow() {
+		showMessages("No cows nearby!", 0.5)
+		return
+	}
+
+	for _, cow := range world.Animals {
+		if cow.Type == "cow" && time.Since(cow.LastMilked) >= 30*time.Minute {
+			if added := addToInventory(20, "Milk", false, 1); added {
+				cow.LastMilked = time.Now()
+				showMessages("Milked cow! Got fresh milk.", 0.3)
+				return
+			} else {
+				showMessages("Inventory full - make space!", 0.5)
+				return
+			}
+		} else if cow.Type == "cow" {
+			remaining := 2*time.Minute - time.Since(cow.LastMilked)
+			showMessages(fmt.Sprintf("Cow needs rest! Come back in %0.1f minutes.",
+				remaining.Minutes()), 1.5)
+			return
 		}
 	}
 }
@@ -463,7 +532,6 @@ func init() {
 	showMessages("Whoa there\nPress ESC to pause catch your breath,\nknow more about the game keybindings, and Save your progress.", 2.0)
 
 	plants := rl.LoadTexture("assets/Objects/Basic_Plants.png")
-	//tools := rl.LoadTexture("assets/Objects/Basic_tools_and_meterials.png")
 	grassSprite = rl.LoadTexture("assets/Tilesets/Grass.png")
 	houseSprite = rl.LoadTexture("assets/Tilesets/Wooden_House_Walls_Tilset.png")
 	shopSprite = rl.LoadTexture("assets/Objects/Basic_Furniture.png")
@@ -482,20 +550,8 @@ func init() {
 	tileDest = rl.NewRectangle(0, 0, 16, 16)
 	tileSrc = rl.NewRectangle(0, 0, 16, 16)
 
-	// cowSprite = rl.LoadTexture("assets/Characters/FreeCowSprites.png")
-	// chickenSprite = rl.LoadTexture("assets/Characters/FreeChickenSprites.png")
-	// world.Animals = []*Animal{
-	// 	{
-	// 		Type:     "cow",
-	// 		Position: Vector2{X: 6, Y: 3},
-	// 		Texture:  cowSprite,
-	// 	},
-	// 	{
-	// 		Type:     "chicken",
-	// 		Position: Vector2{X: 9, Y: 3},
-	// 		Texture:  chickenSprite,
-	// 	},
-	// }
+	cowSprite = rl.LoadTexture("assets/Characters/FreeCowSprites.png")
+	chickenHouseSprite = rl.LoadTexture("assets/Objects/Free_Chicken_House.png")
 
 	playerSprite = rl.LoadTexture("assets/Characters/BasicCharakterSpritesheet.png")
 	playerSrc = rl.NewRectangle(0, 0, 48, 48)
@@ -532,6 +588,8 @@ func init() {
 	loadMap("assets/one.map")
 	world.InitShopCounter()
 	world.InitbakeryCounter()
+	world.InitChickenHouse()
+	world.InitCows()
 }
 
 func quit() {

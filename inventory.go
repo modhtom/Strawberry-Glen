@@ -133,6 +133,8 @@ func useInventoryItem(idx int) {
 			tryTillSoil()
 		case 3: // Watering Can
 			tryWaterCrop()
+		case 6: // Milking Bucket
+			tryMilkCow()
 		default:
 			showMessages("Used "+slot.ItemName, 0.5)
 		}

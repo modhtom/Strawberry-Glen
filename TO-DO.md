@@ -17,8 +17,8 @@ Time & Progression System
 Implement day/night cycle,
 growth timers,
 bake queues,
-cow milking,⚠️--NOT DONE YET--⚠️
-collecting eggs.⚠️--NOT DONE YET--⚠️
+cow milking,
+collecting eggs.
 
 Game Loops
 Farming loop: Plant → water → grow → harvest → store/sell.
@@ -27,14 +27,14 @@ Economy & Progression: Cashflow, unlocks (new seeds, recipes, upgrades).
 
 Interaction System “use” key (‘E’) for talking, picking, planting, opening shop.
 
-3. Asset Pipeline Art & Animation
+3. Asset Pipeline Art & Animation ⚠️--NOT DONE YET--⚠️
 
 Audio Integration
 Curate SFX for footsteps, planting, vending; BGM for day, night, shop ambience.
 Set up audio manager (volume settings, mute toggle, layering).
 
 Art
-Fix Items textures, Desk, crops and animals.
+Fix main menu, Items textures, Desk, crops and Cows.
 
 4. User Interface & UX HUD & Menus --DONE--
 
@@ -42,18 +42,13 @@ Inventory screen: item slots, counts, tooltips.
 Shop interface: buy/sell dialog, pricing, stock.
 Pause/settings: volume sliders, keybindings, save/load.
 
-5. Narrative & Worldbuilding Story & Goals
+5. Narrative & Worldbuilding Story & Goals ⚠️--NOT DONE YET--⚠️
 
 Player backstory, long‑term objectives (e.g., expand farm, win bakery contest).
 
 NPC profiles, routines, and failure/fallback states (missed harvest, debts).
 
-6. Testing, Polish & Release
+6. Testing, Polish & Release ⚠️--NOT DONE YET--⚠️
 
 Save/Load System
 Persistent world state (tile changes, inventory, money, day count).
-
-7. Deployment & Post‑Launch
-
-Updates & Roadmap
-Plan DLC/content updates, seasonal events, player feedback channels.
