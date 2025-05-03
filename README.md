@@ -65,7 +65,7 @@ Clone the repository and run the game:
 ```
 git clone https://github.com/yourusername/strawberry-glen.git
 cd strawberry-glen
-go run main.go inventory.go shop.go
+go run .
 ```
 
 ---
