@@ -162,14 +162,7 @@ go run main.go inventory.go shop.go
 
 ---
 
-**Pro Tips:**  
-🔸 **Stack smart**: Seeds/crops stack in inventory (e.g. 5 Wheat Seeds = 1 slot)  
-🔹 **Experiment**: Try combos like 🍓+🥛+🌾 in oven for Strawberry Milk Cake!  
-🔻 **Quick sell**: "Experimental Jam (ID:34)" vanishes after use - sell it fast!
-
----
-
-** 🌟 New Progression Features **
+## 🌟 New Progression Features 
 
 - Unlock Large Backpack after 7 days (+2 slots)
 - Earn Fertilizer upgrade after 20 harvests (+25% growth)
