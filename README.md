@@ -19,17 +19,54 @@ A whimsical 2D farm-bakery simulator where you inherit a magical farm, grow ench
 
 ## 🛠️ Installation
 
-1. **Prerequisites**:
+### 1. **Prerequisites**
 
-   - [Go](https://golang.org/dl/) (1.16+)
-   - [Raylib](https://www.raylib.com/) (C library) and [raylib-go](https://github.com/gen2brain/raylib-go) bindings.
+Make sure the following are installed on your system:
 
-2. **Run the Game**:
-   ```bash
-   git clone https://github.com/yourusername/strawberry-glen.git
-   cd strawberry-glen
-   go run main.go inventory.go shop.go
-   ```
+- **[Go](https://golang.org/dl/)** (version 1.16 or higher)
+- **[Raylib](https://www.raylib.com/)** (C library)
+- **[raylib-go](https://github.com/gen2brain/raylib-go)** bindings for Go
+
+#### OS-specific Notes:
+
+- **Linux (Ubuntu/Debian)**:
+
+  ```
+  sudo apt install build-essential libgl1-mesa-dev libopenal-dev libxcursor-dev libxi-dev libxrandr-dev libxinerama-dev libxxf86vm-dev libx11-dev
+  go get github.com/gen2brain/raylib-go/raylib
+  ```
+
+- **macOS** (with Homebrew):
+
+  ```
+  brew install raylib
+  go get github.com/gen2brain/raylib-go/raylib
+  ```
+
+- **Windows**:
+
+  - Install [MSYS2](https://www.msys2.org/) and run:
+
+    ```
+    pacman -S mingw-w64-x86_64-gcc
+    ```
+
+  - Add Raylib: [Download precompiled binaries](https://github.com/raysan5/raylib/releases)
+  - Add `raylib` to your system `PATH`, and then run:
+
+    ```
+    go get github.com/gen2brain/raylib-go/raylib
+    ```
+
+### 2. **Run the Game**
+
+Clone the repository and run the game:
+
+```
+git clone https://github.com/yourusername/strawberry-glen.git
+cd strawberry-glen
+go run main.go inventory.go shop.go
+```
 
 ---
 
@@ -60,20 +97,30 @@ A whimsical 2D farm-bakery simulator where you inherit a magical farm, grow ench
 
 ## 🎮 Master the Keys - Control Cheat Sheet
 
-**Movement & Exploration**  
-🕹️ `WASD`/`Arrow Keys` – Move your character  
-🔍 `Z`/`X` – Zoom in/out to see details or the big picture
+**Core Movement**  
+⮕ `WASD/Arrow Keys` - Move character  
+⮕ `E` - Interact with crops/animals/objects
 
-**Quick Actions**  
-🎒 `I` – Open/close your **inventory** (manage seeds, tools, and goodies)  
-🏪 `B` – Toggle the **shop** (buy low, sell high!)  
-🏪 `E` – Interact with things
-⏸️ `ESC` – Pause game to access settings or save progress
+**Inventory & Crafting**  
+🎒 `I` - Toggle inventory  
+🔢 `1-6` - Quick-select inventory slots  
+🔄 `TAB` - Switch between shop modes (Buy/Sell/Bake)  
+🗑️ `ALT+1-6` - Remove ingredients while baking
 
-**Inventory Management**  
-🖱️ `Mouse Hover` – Preview item details in your inventory  
-✅ `Enter`/`Left Click` – Use selected item (plant seeds, water crops, play the cow flute!)  
-⬅️➡️ `Arrow Keys` – Navigate inventory slots when menu is open
+**Farming Actions**  
+🌾 `4 (Hoe)` - Till soil (assign to inventory slot)  
+💧 `3 (Watering Can)` - Water crops  
+🐄 `6 (Milking Bucket)` - Milk cows
+
+**Bakery Special**  
+👨🍳 `TAB` - Switch between buying and baking modes  
+✅ `ENTER` - Confirm recipe selection  
+🔀 `Arrow Keys` - Navigate bakery recipes
+
+**System Controls**  
+⏸️ `ESC` - Pause game/open menu  
+🖥️ `F11` - Toggle fullscreen  
+🔍 `Z/X` - Zoom in/out
 
 ---
 
@@ -108,10 +155,25 @@ A whimsical 2D farm-bakery simulator where you inherit a magical farm, grow ench
 
 ---
 
+## 🐔 Expanded Animal Care
+
+- **Chicken Coop**: Collect eggs every 2 minutes using `B` near coop
+- **Cow Milking**: Milk cows every 2 minutes with milking bucket
+
+---
+
 **Pro Tips:**  
 🔸 **Stack smart**: Seeds/crops stack in inventory (e.g. 5 Wheat Seeds = 1 slot)  
 🔹 **Experiment**: Try combos like 🍓+🥛+🌾 in oven for Strawberry Milk Cake!  
 🔻 **Quick sell**: "Experimental Jam (ID:34)" vanishes after use - sell it fast!
+
+---
+
+** 🌟 New Progression Features **
+
+- Unlock Large Backpack after 7 days (+2 slots)
+- Earn Fertilizer upgrade after 20 harvests (+25% growth)
+- Discover Eldermint Seeds at 5000G for special recipes
 
 ---
 

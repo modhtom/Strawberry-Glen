@@ -127,37 +127,33 @@ func drawKeybindings() {
 	rl.DrawRectangle(0, 0, int32(screenWidth), int32(screenHeight), rl.NewColor(0, 0, 0, 180))
 
 	box := rl.NewRectangle(
-		float32(screenWidth/2)-120,
-		float32(screenHeight/2)-100,
-		250,
-		300,
+		float32(screenWidth/2)-200,
+		float32(screenHeight/2)-150,
+		400,
+		400,
 	)
 	rl.DrawRectangleRec(box, rl.NewColor(80, 10, 10, 230))
 	rl.DrawRectangleLines(int32(box.X), int32(box.Y), int32(box.Width), int32(box.Height), rl.White)
-	rl.DrawText("keybindings", int32(box.X+60), int32(box.Y+10), 30, rl.White)
-	rl.DrawText("Use arrow keys or WASD to move.", int32(box.X+20), int32(box.Y+50), 30, rl.White)
-	rl.DrawText("Zoom in with 'Z', zoom out with 'X'.", int32(box.X+20), int32(box.Y+90), 30, rl.White)
-	rl.DrawText("Use 'I' to open your Inventory.", int32(box.X+20), int32(box.Y+130), 30, rl.White)
-	rl.DrawText("Use 'B' to open Shop.", int32(box.X+20), int32(box.Y+170), 30, rl.White)
-	buttons := []struct {
-		rect   rl.Rectangle
-		text   string
-		action func()
-	}{
-		{rl.NewRectangle(box.X+100, box.Y+200, 200, 40), "Close Window", func() { showKeyBindings = false }}}
+	rl.DrawText("KEY BINDINGS", int32(box.X+140), int32(box.Y+20), 20, rl.White)
 
-	mousePos := rl.GetMousePosition()
-	for _, btn := range buttons {
-		color := rl.DarkGray
-		if rl.CheckCollisionPointRec(mousePos, btn.rect) {
-			color = rl.Gray
-			if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-				btn.action()
-			}
-		}
-		rl.DrawRectangleRec(btn.rect, color)
-		rl.DrawText(btn.text, int32(btn.rect.X+10), int32(btn.rect.Y+10), 20, rl.White)
-	}
+	startY := int32(box.Y + 60)
+	rl.DrawText("Movement:", int32(box.X+20), startY, 20, rl.Gold)
+	rl.DrawText("WASD/Arrow Keys - Move", int32(box.X+40), startY+30, 20, rl.White)
+	rl.DrawText("E - Interact", int32(box.X+40), startY+60, 20, rl.White)
+
+	rl.DrawText("Inventory/Shop:", int32(box.X+20), startY+100, 20, rl.Gold)
+	rl.DrawText("I - Open Inventory", int32(box.X+40), startY+130, 20, rl.White)
+	rl.DrawText("B - Open Shop/Bakery", int32(box.X+40), startY+160, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("1-%v - Quick Select Slots", InventorySize), int32(box.X+40), startY+190, 20, rl.White)
+
+	rl.DrawText("Baking:", int32(box.X+20), startY+230, 20, rl.Gold)
+	rl.DrawText("TAB - Switch Buy/Bake", int32(box.X+40), startY+260, 20, rl.White)
+	rl.DrawText("ALT+1-6 - Remove Ingredients", int32(box.X+40), startY+290, 20, rl.White)
+	rl.DrawText("ENTER - Confirm Action", int32(box.X+40), startY+320, 20, rl.White)
+
+	rl.DrawText("System:", int32(box.X+20), startY+360, 20, rl.Gold)
+	rl.DrawText("ESC - Pause/Menu", int32(box.X+40), startY+390, 20, rl.White)
+	rl.DrawText("F11 - Fullscreen", int32(box.X+40), startY+420, 20, rl.White)
 }
 
 func showMessages(text string, aMessageDuration float32) {
