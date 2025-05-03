@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	InventorySize = 7
+	InventorySize = 6
 	itemSprites   map[int]ItemSprite
 )
 
@@ -82,8 +82,13 @@ func applyUpgrades() {
 
 func drawInventory() {
 	slotCount := len(playerInv.Slots)
-	rl.DrawRectangle(50, 50, screenWidth-100, 100, rl.NewColor(0, 0, 0, 180))
-	slotWidth := float32((screenWidth - 100) / slotCount)
+	invWidth := screenWidth - 100
+	if screenWidth < 600 {
+		invWidth = screenWidth - 40
+	}
+
+	rl.DrawRectangle(50, 50, int32(invWidth), 100, rl.NewColor(0, 0, 0, 180))
+	slotWidth := float32(invWidth) / float32(slotCount)
 	y := float32(60)
 	for i := range InventorySize {
 		x := 50 + slotWidth*float32(i)

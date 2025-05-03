@@ -89,7 +89,7 @@ func (w *World) InitCows() {
 	w.Animals = []*Animal{
 		{
 			Type:       "cow",
-			Position:   Vector2{X: 2, Y: 3},
+			Position:   Vector2{X: 5, Y: 3},
 			Texture:    cowSprite,
 			LastMilked: time.Now().Add(-1 * time.Hour),
 		},
@@ -125,7 +125,7 @@ func (w *World) Update() {
 	for _, crop := range w.Crops {
 		if crop.GrowthStage < 3 {
 			crop.GrowthTimer += float32(delta)
-			if crop.GrowthTimer >= 24 {
+			if crop.GrowthTimer >= crop.TimePerStage*60 {
 				crop.GrowthStage++
 				crop.GrowthTimer = 0
 			}
@@ -177,7 +177,7 @@ func (w *World) RemoveCrop(cropToRemove *Crop) {
 	for _, e := range w.Entities {
 		isCropToRemove := false
 		if e.Type == "crop" {
-			if cropRef, ok := e.Metadata["cropRef"].(*Crop); ok {
+			if cropRef, ok := e.Metadata["crop"].(*Crop); ok {
 				if cropRef == cropToRemove {
 					isCropToRemove = true
 				}

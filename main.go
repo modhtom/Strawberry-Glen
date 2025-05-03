@@ -9,12 +9,24 @@ import (
 )
 
 const (
-	screenHeight = 480
-	screenWidth  = 1000
+	StateMainMenu = iota
+	StatePlaying
+	StateCredits
 )
 
 var (
+	screenHeight  = 480
+	screenWidth   = 1000
+	windowResized = false
+	prevScreenW   = screenWidth
+	prevScreenH   = screenHeight
+
 	running = true
+
+	gameState      = StateMainMenu
+	saveFileExists = false
+	menuCursor     = 0
+	menuItems      = []string{"Play", "Continue", "Credits", "Exit"}
 
 	tex      rl.Texture2D
 	bkgColor = rl.NewColor(147, 211, 196, 255)
@@ -84,11 +96,24 @@ func addGold(amount int) {
 
 func input() {
 	if rl.IsKeyPressed(rl.KeyEscape) {
-		paused = !paused
+		if gameState == StatePlaying {
+			paused = !paused
+		} else {
+			gameState = StateMainMenu
+		}
 	}
 
 	if paused {
 		return
+	}
+	if rl.IsKeyPressed(rl.KeyF11) {
+		rl.ToggleFullscreen()
+	}
+
+	if rl.IsWindowResized() {
+		screenWidth = int(rl.GetScreenWidth())
+		screenHeight = int(rl.GetScreenHeight())
+		windowResized = true
 	}
 
 	if playerInv.Open {
@@ -175,7 +200,6 @@ func input() {
 			switch shopMode {
 			case 0: // BUY
 				if playerGold >= item.PriceBuy && item.Stock > 0 {
-					addGold(-item.PriceBuy)
 					playerGold -= item.PriceBuy
 					item.Stock--
 					if found {
@@ -329,7 +353,7 @@ func tryMilkCow() {
 	}
 
 	for _, cow := range world.Animals {
-		if cow.Type == "cow" && time.Since(cow.LastMilked) >= 30*time.Minute {
+		if cow.Type == "cow" && time.Since(cow.LastMilked) >= 2*time.Minute {
 			if added := addToInventory(20, "Milk", false, 1); added {
 				cow.LastMilked = time.Now()
 				showMessages("Milked cow! Got fresh milk.", 0.3)
@@ -387,6 +411,14 @@ func isPlayerNearBakery() bool {
 
 func update() {
 	running = !rl.WindowShouldClose()
+
+	if windowResized {
+		cam.Offset = rl.NewVector2(float32(screenWidth/2), float32(screenHeight/2))
+		cam.Zoom = rl.Clamp(cam.Zoom, 0.5, 3.0)
+		windowResized = false
+		prevScreenW = screenWidth
+		prevScreenH = screenHeight
+	}
 
 	playerSrc.X = playerSrc.Width * float32(playerFrame)
 	var dx, dy float32 = 0, 0
@@ -505,7 +537,11 @@ func render() {
 	}
 	rl.DrawText(fmt.Sprintf("Day: %d", numberOfDays), 10, 10, 20, rl.White)
 	rl.DrawText(fmt.Sprintf("Time: %02d:%02d %s", displayHour, minute, ampm), 10, 35, 20, rl.White)
-	rl.DrawText(fmt.Sprintf("Gold: %d G", playerGold), screenWidth-150, 10, 20, rl.Gold)
+	goldTextX := screenWidth - 150
+	if screenWidth < 800 {
+		goldTextX = screenWidth - 130
+	}
+	rl.DrawText(fmt.Sprintf("Gold: %d G", playerGold), int32(goldTextX), 10, 20, rl.Gold)
 
 	if shopOpen {
 		drawShop()
@@ -526,7 +562,8 @@ func render() {
 }
 
 func init() {
-	rl.InitWindow(screenWidth, screenHeight, "Strawberry Glen")
+	rl.SetConfigFlags(rl.FlagWindowResizable)
+	rl.InitWindow(int32(screenWidth), int32(screenHeight), "Strawberry Glen")
 	rl.SetExitKey(0)
 	rl.SetTargetFPS(60)
 	showMessages("Whoa there\nPress ESC to pause catch your breath,\nknow more about the game keybindings, and Save your progress.", 2.0)
@@ -573,9 +610,13 @@ func init() {
 	musicPaused = false
 	rl.PlayMusicStream(music)
 
-	cam = rl.NewCamera2D(rl.NewVector2(float32(screenWidth/2), float32(screenHeight/2)),
-		rl.NewVector2(float32(playerDest.X-(playerDest.Width/2)),
-			float32(playerDest.Y-(playerDest.Height/2))), 0.0, 2.0)
+	cam = rl.NewCamera2D(
+		rl.NewVector2(float32(screenWidth/2), float32(screenHeight/2)), // Offset
+		rl.NewVector2(float32(playerDest.X-(playerDest.Width/2)), // Target
+			float32(playerDest.Y-(playerDest.Height/2))),
+		0.0, // Rotation
+		2.0, // Zoom
+	)
 
 	gameSave = false
 
@@ -603,11 +644,46 @@ func quit() {
 	defer rl.CloseWindow()
 }
 
+func handleMainMenu() {
+	if rl.IsKeyPressed(rl.KeyDown) {
+		menuCursor = (menuCursor + 1) % len(menuItems)
+	}
+	if rl.IsKeyPressed(rl.KeyUp) {
+		menuCursor = (menuCursor - 1 + len(menuItems)) % len(menuItems)
+	}
+
+	if rl.IsKeyPressed(rl.KeyEnter) || rl.IsKeyPressed(rl.KeySpace) {
+		switch menuCursor {
+		case 0: // Play
+			gameState = StatePlaying
+			// Add game initialization here
+		case 1: // Continue
+			if saveFileExists {
+				gameState = StatePlaying
+				//TODO: Add save loading here
+			}
+		case 2: // Credits
+			gameState = StateCredits
+		case 3: // Exit
+			running = false
+		}
+	}
+}
+
 func main() {
 	for running {
-		input()
-		update()
-		render()
+		switch gameState {
+		case StateMainMenu:
+			handleMainMenu()
+			drawMainMenu()
+		case StateCredits:
+			handleCredits()
+			drawCredits()
+		default:
+			input()
+			update()
+			render()
+		}
 	}
 	quit()
 	// runEditor()

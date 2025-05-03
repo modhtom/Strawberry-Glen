@@ -49,7 +49,6 @@ func findInventorySlot(id int) (*InventorySlot, bool) {
 	}
 	return nil, false
 }
-
 func addToInventory(id int, name string, reusable bool, qtyToAdd int) bool {
 	itemData, ok := Items[id]
 	if !ok {
@@ -59,90 +58,90 @@ func addToInventory(id int, name string, reusable bool, qtyToAdd int) bool {
 
 	maxStack := itemData.MaxStack
 	isStackable := !reusable && maxStack > 1
-
-	addedSuccessfully := false
 	remainingQty := qtyToAdd
+	added := false
 
+	// Helper function to get minimum of two integers
+	min := func(a, b int) int {
+		if a < b {
+			return a
+		}
+		return b
+	}
+
+	// PHASE 1: Fill existing stacks first
 	if isStackable {
+		// Check all slots for existing stacks
 		for i := range playerInv.Slots {
+			if remainingQty <= 0 {
+				break
+			}
+
 			slot := &playerInv.Slots[i]
 			if slot.ItemID == id && slot.ItemQuantity < maxStack {
-				canAdd := maxStack - slot.ItemQuantity
-				addAmount := 0
-				if remainingQty <= canAdd {
-					addAmount = remainingQty
-				} else {
-					addAmount = canAdd
-				}
+				availableSpace := maxStack - slot.ItemQuantity
+				toAdd := min(remainingQty, availableSpace)
 
-				slot.ItemQuantity += addAmount
-				remainingQty -= addAmount
-				addedSuccessfully = true
-				fmt.Printf("Added %d to existing stack of %s (Slot %d). New Qty: %d. Remaining to Add: %d\n", addAmount, name, i, slot.ItemQuantity, remainingQty)
-
-				if remainingQty <= 0 {
-					return true
-				}
+				slot.ItemQuantity += toAdd
+				remainingQty -= toAdd
+				added = true
 			}
 		}
 	}
 
+	// PHASE 2: Use empty slots for remaining quantity
 	if remainingQty > 0 {
-		for i := range playerInv.Slots {
-			slot := &playerInv.Slots[i]
-			if slot.ItemID == 0 {
-				addAmount := 0
-				if isStackable {
-					if remainingQty <= maxStack {
-						addAmount = remainingQty
-					} else {
-						addAmount = maxStack
-					}
-				} else {
-					if remainingQty > 0 {
-						addAmount = 1
-					} else {
-						addAmount = 0
-					}
-				}
-
-				if addAmount > 0 {
-					slot.ItemID = id
-					slot.ItemName = name
-					slot.ItemReusable = reusable
-					slot.ItemQuantity = addAmount
-					remainingQty -= addAmount
-					addedSuccessfully = true
-					fmt.Printf("Added %d %s to new slot %d. Remaining to Add: %d\n", addAmount, name, i, remainingQty)
-
-					if remainingQty <= 0 {
-						return true
-					}
-
-					if !isStackable {
-						return true
-					}
-
-				} else {
-					// This case shouldn't be reached if remainingQty > 0, but safety break
+		if isStackable {
+			// For stackable items, fill empty slots completely
+			for i := range playerInv.Slots {
+				if remainingQty <= 0 {
 					break
 				}
 
+				slot := &playerInv.Slots[i]
+				if slot.ItemID == 0 {
+					toAdd := min(remainingQty, maxStack)
+
+					slot.ItemID = id
+					slot.ItemName = name
+					slot.ItemReusable = reusable
+					slot.ItemQuantity = toAdd
+					remainingQty -= toAdd
+					added = true
+				}
+			}
+		} else {
+			// For non-stackable items, use one slot per item
+			for i := 0; i < remainingQty; i++ {
+				foundSlot := false
+
+				for j := range playerInv.Slots {
+					slot := &playerInv.Slots[j]
+					if slot.ItemID == 0 {
+						slot.ItemID = id
+						slot.ItemName = name
+						slot.ItemReusable = reusable
+						slot.ItemQuantity = 1
+						foundSlot = true
+						added = true
+						break
+					}
+				}
+
+				if !foundSlot {
+					remainingQty = i
+					break
+				}
 			}
 		}
 	}
 
-	if !addedSuccessfully {
-		showMessages("Inventory full! Cannot add "+name+".", 1.0)
-		return false
-	}
-
+	// Handle remaining quantity feedback
 	if remainingQty > 0 {
-		showMessages(fmt.Sprintf("Inventory full! Could not add %d %s.", remainingQty, name), 1.0)
-		return true
+		showMessages(fmt.Sprintf("Inventory full! Couldn't add %d %s", remainingQty, name), 1.0)
 	}
 
-	return true
+	return added || qtyToAdd > remainingQty
 }
 
 func drawShop() {

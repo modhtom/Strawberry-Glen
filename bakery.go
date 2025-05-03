@@ -68,10 +68,11 @@ func drawBakery() {
 			}
 			stock := it.Stock
 			if bakeryMode == 1 {
-				if slot, ok := findInventorySlot(it.ID); ok {
-					stock = slot.ItemQuantity
-				} else {
-					stock = 0
+				stock = 0
+				for _, slot := range playerInv.Slots {
+					if slot.ItemID == it.ID {
+						stock += slot.ItemQuantity
+					}
 				}
 			}
 			color := rl.White
@@ -112,8 +113,11 @@ func drawBakingInterface(x, y, w, h float32) {
 			int32(x+20), int32(int(startY)+30+24*i), 20, rl.LightGray)
 	}
 
-	rl.DrawText("Press 1-5 to add ingredients from inventory slots",
+	rl.DrawText(fmt.Sprintf("Press 1-%v to add ingredients from inventory slots", InventorySize),
 		int32(x+20), int32(y+h-80), 16, rl.LightGray)
+
+	rl.DrawText(fmt.Sprintf("Press ALT + 1-%v to remove ingredients from inventory slots", InventorySize),
+		int32(x+20), int32(y+h-100), 16, rl.LightGray)
 }
 
 func tryBake() bool {
@@ -191,8 +195,8 @@ func handleBakingInput() {
 		tryBake()
 	}
 
-	// Add ingredients with number keys 1-5
-	for i := 0; i < 5; i++ {
+	// Add ingredients with number keys 1-InventorySize
+	for i := range InventorySize {
 		if rl.IsKeyPressed(int32(rl.KeyOne) + int32(i)) {
 			if i < len(playerInv.Slots) {
 				itemID := playerInv.Slots[i].ItemID
@@ -202,4 +206,17 @@ func handleBakingInput() {
 			}
 		}
 	}
+
+	// Remove ingredients with ALT + number keys 1-InventorySize
+	for i := 0; i < len(selectedIngredients); i++ {
+		keyIndex := int32(rl.KeyOne) + int32(i)
+		if rl.IsKeyDown(rl.KeyLeftAlt) && rl.IsKeyPressed(keyIndex) {
+			itemID := selectedIngredients[i]
+			itemData := Items[itemID]
+			addToInventory(itemID, itemData.Name, false, 1)
+			selectedIngredients = append(selectedIngredients[:i], selectedIngredients[i+1:]...)
+			break
+		}
+	}
+
 }

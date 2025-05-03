@@ -58,24 +58,6 @@ func drawScene() {
 			rl.NewVector2(tileDest.Width, tileDest.Height), 0, rl.White)
 	}
 
-	// for _, animal := range world.Animals {
-	// 	animalDest := rl.NewRectangle(
-	// 		float32(animal.Position.X)*tileDest.Width,
-	// 		float32(animal.Position.Y)*tileDest.Height,
-	// 		tileDest.Width,
-	// 		tileDest.Height,
-	// 	)
-
-	// 	var src rl.Rectangle
-	// 	switch animal.Type {
-	// 	case "cow":
-	// 		src = rl.NewRectangle(0, 0, 16, 16)
-	// 	}
-
-	// 	rl.DrawTexturePro(animal.Texture, src, animalDest,
-	// 		rl.NewVector2(0, 0), 0, rl.White)
-	// }
-
 	for _, crop := range world.Crops {
 		if crop != nil {
 			cropTexture := wheatGrowthSprite
@@ -83,8 +65,8 @@ func drawScene() {
 			cropSrcRect := crop.GetSpriteRect()
 
 			cropDestRect := rl.NewRectangle(
-				float32(crop.PosX)*tileDest.Width,
-				float32(crop.PosY)*tileDest.Height,
+				float32(crop.PosX-1)*tileDest.Width,
+				float32(crop.PosY-1)*tileDest.Height,
 				tileDest.Width,
 				tileDest.Height,
 			)
@@ -103,9 +85,14 @@ func drawScene() {
 }
 
 func drawPauseMenu() {
-	rl.DrawRectangle(0, 0, screenWidth, screenHeight, rl.NewColor(0, 0, 0, 180))
+	rl.DrawRectangle(0, 0, int32(screenWidth), int32(screenHeight), rl.NewColor(0, 0, 0, 180))
 
-	box := rl.NewRectangle(screenWidth/2-120, screenHeight/2-100, 400, 220)
+	box := rl.NewRectangle(
+		float32(screenWidth/2)-120,
+		float32(screenHeight/2)-100,
+		400,
+		220,
+	)
 	rl.DrawRectangleRec(box, rl.NewColor(80, 10, 10, 230))
 	rl.DrawRectangleLines(int32(box.X), int32(box.Y), int32(box.Width), int32(box.Height), rl.White)
 	rl.DrawText("PAUSED", int32(box.X+60), int32(box.Y+10), 30, rl.White)
@@ -119,7 +106,7 @@ func drawPauseMenu() {
 		{rl.NewRectangle(box.X+20, box.Y+110, 200, 40), "Toggle Sound", func() { musicPaused = !musicPaused }},
 		{rl.NewRectangle(box.X+20, box.Y+160, 200, 40), "Save", func() { gameSave = !gameSave }},
 		{rl.NewRectangle(box.X+20, box.Y+210, 200, 40), "keybindings", func() { showKeyBindings = !showKeyBindings }},
-		{rl.NewRectangle(box.X+20, box.Y+260, 200, 40), "Main Menu", func() { running = false }},
+		{rl.NewRectangle(box.X+20, box.Y+260, 200, 40), "Main Menu", func() { gameState = StateMainMenu }},
 	}
 
 	mousePos := rl.GetMousePosition()
@@ -137,9 +124,14 @@ func drawPauseMenu() {
 }
 
 func drawKeybindings() {
-	rl.DrawRectangle(0, 0, screenWidth, screenHeight, rl.NewColor(0, 0, 0, 180))
+	rl.DrawRectangle(0, 0, int32(screenWidth), int32(screenHeight), rl.NewColor(0, 0, 0, 180))
 
-	box := rl.NewRectangle(screenWidth/2-120, screenHeight/2-100, 250, 300)
+	box := rl.NewRectangle(
+		float32(screenWidth/2)-120,
+		float32(screenHeight/2)-100,
+		250,
+		300,
+	)
 	rl.DrawRectangleRec(box, rl.NewColor(80, 10, 10, 230))
 	rl.DrawRectangleLines(int32(box.X), int32(box.Y), int32(box.Width), int32(box.Height), rl.White)
 	rl.DrawText("keybindings", int32(box.X+60), int32(box.Y+10), 30, rl.White)
@@ -199,15 +191,19 @@ func drawMessage() {
 		}
 	}
 
-	bgX := screenWidth/2 - maxWidth/2 - 10
-	bgY := screenHeight - totalHeight - 20
+	bgX := int32(screenWidth/2) - maxWidth/2 - 10
+	bgY := int32(screenHeight) - totalHeight - 20
 	rl.DrawRectangle(bgX, bgY, maxWidth+20, totalHeight+10, rl.NewColor(0, 0, 0, 200))
 
 	for i, line := range lines {
-		rl.DrawText(line, screenWidth/2-rl.MeasureText(line, fontSize)/2, bgY+5+int32(i)*lineHeight, fontSize, rl.White)
+		textWidth := rl.MeasureText(line, fontSize)
+		rl.DrawText(line,
+			int32(screenWidth/2)-textWidth/2,
+			bgY+5+int32(i)*lineHeight,
+			fontSize,
+			rl.White)
 	}
 }
-
 func loadMap(mapFile string) {
 	data, err := os.ReadFile(mapFile)
 	if err != nil {

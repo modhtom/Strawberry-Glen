@@ -118,7 +118,7 @@ func tryPlantSeed(seedData ItemData) bool {
 	newCrop := &Crop{
 		ID:            seedData.ID,
 		CropTypeID:    seedData.GrowsIntoID,
-		GrowthStage:   0,
+		GrowthStage:   1,
 		MaxGrowth:     seedData.GrowthStages - 1,
 		GrowthTimer:   0,
 		TimePerStage:  seedData.TimePerStage,
@@ -160,18 +160,6 @@ func tryWaterCrop() {
 
 func tryInteract() {
 	tileX, tileY := getFacingTilePos()
-
-	// for _, a := range world.Animals {
-	// 	if a.Position.X == tileX && a.Position.Y == tileY {
-	// 		switch a.Type {
-	// 		case "cow":
-	// 			tryMilkCow(a.Position)
-	// 		case "chicken":
-	// 			tryCollectEgg(a.Position)
-	// 		}
-	// 		return
-	// 	}
-	// }
 
 	crop := world.GetCropAt(tileX, tileY)
 	if crop != nil && crop.IsHarvestable() {
