@@ -27,9 +27,9 @@ Economy & Progression: Cashflow, unlocks (new seeds, recipes, upgrades).
 
 Interaction System “use” key (‘E’) for talking, picking, planting, opening shop.
 
-3. Asset Pipeline Art & Animation ⚠️--NOT DONE YET--⚠️
+3. Asset Pipeline Art & Animation --DONE--
 
-Audio Integration
+Audio Integration ⚠️--NOT DONE YET--⚠️
 Curate SFX for footsteps, planting, vending; BGM for day, night, shop ambience.
 Set up audio manager (volume settings, mute toggle, layering).
 

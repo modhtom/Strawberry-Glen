@@ -89,10 +89,10 @@ func drawInventory() {
 
 	rl.DrawRectangle(50, 50, int32(invWidth), 100, rl.NewColor(0, 0, 0, 180))
 	slotWidth := float32(invWidth) / float32(slotCount)
-	y := float32(60)
+	var slotHeight, y float32 = 80, 60
 	for i := range InventorySize {
 		x := 50 + slotWidth*float32(i)
-		box := rl.NewRectangle(x, y, slotWidth-10, 80)
+		box := rl.NewRectangle(x, y, slotWidth-10, slotHeight)
 		color := rl.DarkGray
 
 		if i == playerInv.Cursor {
@@ -102,11 +102,29 @@ func drawInventory() {
 			color = rl.LightGray
 		}
 		rl.DrawRectangleRec(box, color)
+		rl.DrawRectangleLinesEx(box, 2, rl.NewColor(100, 100, 100, 255))
 
 		slot := &playerInv.Slots[i]
+		if slot.ItemID == 0 {
+			continue
+		}
 		sprite, ok := itemSprites[slot.ItemID]
 		if ok {
-			rl.DrawTextureRec(sprite.Texture, sprite.Src, rl.NewVector2(x+10, y+10), rl.White)
+			var scale float32 = 2.8
+			itemWidth := sprite.Src.Width * scale
+			itemHeight := sprite.Src.Height * scale
+
+			itemX := x + (box.Width-itemWidth)/2
+			itemY := y + (box.Height-itemHeight)/2 - 10
+
+			rl.DrawTexturePro(
+				sprite.Texture,
+				sprite.Src,
+				rl.NewRectangle(itemX, itemY, itemWidth, itemHeight),
+				rl.NewVector2(0, 0),
+				0,
+				rl.White,
+			)
 		} else {
 			name := Items[slot.ItemID].Name
 			if name != "" {
@@ -116,6 +134,19 @@ func drawInventory() {
 				rl.DrawText("-", int32(x+box.Width/2-4), int32(y+box.Height/2-8), 16, rl.White)
 			}
 		}
+
+		if slot.ItemQuantity > 1 {
+			qtyText := fmt.Sprintf("%d", slot.ItemQuantity)
+			qtyWidth := rl.MeasureText(qtyText, 16)
+			rl.DrawText(
+				qtyText,
+				int32(x+box.Width-10-float32(qtyWidth)),
+				int32(y+box.Height-20),
+				16,
+				rl.White,
+			)
+		}
+
 	}
 }
 
@@ -182,23 +213,23 @@ func loadItemSprites() {
 	milk := rl.LoadTexture("assets/Objects/Simple_Milk_and_grass_item.png")
 
 	itemSprites = map[int]ItemSprite{
-		1:  {plants, rl.NewRectangle(0, 0, 16, 16)},                                                          // Wheat Seeds
-		2:  {plants, rl.NewRectangle(7, 0, 16, 16)},                                                          // Strawberry Seeds
-		3:  {tools, rl.NewRectangle(0, 0, 16, 16)},                                                           // Watering Can
-		4:  {tools, rl.NewRectangle(13, 0, 16, 16)},                                                          // Hoe
-		5:  {tools, rl.NewRectangle(37, 0, 16, 16)},                                                          // Axe
-		6:  {tools, rl.NewRectangle(37, 0, 16, 16)},                                                          // Milk Bucket
-		10: {rl.LoadTexture("assets/Objects/Simple_Milk_and_grass_item.png"), rl.NewRectangle(0, 0, 16, 16)}, // Wheat
-		11: {plants, rl.NewRectangle(26, 0, 16, 16)},                                                         // Strawberry
-		20: {milk, rl.NewRectangle(3, 0, 16, 16)},                                                            // Milk
-		21: {rl.LoadTexture("assets/Objects/Butter.png"), rl.NewRectangle(0, 0, 16, 16)},
-		22: {rl.LoadTexture("assets/Objects/Egg_item.png"), rl.NewRectangle(0, 0, 16, 16)},
-		30: {rl.LoadTexture("assets/Objects/Bread.png"), rl.NewRectangle(0, 0, 16, 16)},
-		31: {rl.LoadTexture("assets/Objects/Strawberry_Tart.png"), rl.NewRectangle(0, 0, 16, 16)},
-		32: {rl.LoadTexture("assets/Objects/Strawberry_Milk_Cake.png"), rl.NewRectangle(0, 0, 16, 16)},
-		33: {rl.LoadTexture("assets/Objects/Burnt_Pie.png"), rl.NewRectangle(0, 0, 16, 16)},
-		34: {rl.LoadTexture("assets/Objects/Experimental_Jam.png"), rl.NewRectangle(0, 0, 16, 16)},
-		40: {rl.LoadTexture("assets/Objects/Eldermint_Leaves.png"), rl.NewRectangle(0, 0, 16, 16)},
-		41: {rl.LoadTexture("assets/Objects/Cow_Flute.png"), rl.NewRectangle(0, 0, 16, 16)},
+		1:  {plants, rl.NewRectangle(0, 0, 16, 16)},       // Wheat Seeds
+		2:  {plants, rl.NewRectangle(0, 1*16, 16, 16)},    // Strawberry Seeds
+		3:  {tools, rl.NewRectangle(0, 0, 16, 16)},        // Watering Can
+		4:  {tools, rl.NewRectangle(2*16, 0, 16, 16)},     // Hoe
+		5:  {tools, rl.NewRectangle(1*16, 0, 16, 16)},     // Axe
+		6:  {milk, rl.NewRectangle(0, 0, 16, 16)},         // Milk Bucket
+		10: {plants, rl.NewRectangle(5*16, 0, 16, 16)},    // Wheat
+		11: {plants, rl.NewRectangle(5*16, 2*16, 16, 16)}, // Strawberry
+		20: {milk, rl.NewRectangle(2*16, 0, 16, 16)},      // Milk
+
+		21: {rl.LoadTexture("assets/Objects/Butter.png"), rl.NewRectangle(0, 0, 32, 32)},                        //Butter
+		22: {rl.LoadTexture("assets/Objects/Egg_item.png"), rl.NewRectangle(0, 0, 16, 16)},                      // Egg
+		30: {rl.LoadTexture("assets/Objects/Bread.png"), rl.NewRectangle(0, 0, 16, 16)},                         //Bread
+		31: {rl.LoadTexture("assets/Objects/Strawberry_Tart.png"), rl.NewRectangle(0, 0, 32, 32)},               //Strawberry Tart
+		32: {rl.LoadTexture("assets/Objects/Strawberry_Milk_Cake.png"), rl.NewRectangle(0, 0, 16, 16)},          //Strawberry Milk Cake
+		33: {rl.LoadTexture("assets/Objects/Burnt_Pie.png"), rl.NewRectangle(0, 0, 32, 32)},                     //Burnt Pie
+		34: {rl.LoadTexture("assets/Objects/Experimental_Jam.png"), rl.NewRectangle(0, 0, 16, 16)},              //Experimental Jam
+		40: {rl.LoadTexture("assets/Objects/Simple_Milk_and_grass_item.png"), rl.NewRectangle(3*16, 0, 16, 16)}, //Eldermint Leaves
 	}
 }

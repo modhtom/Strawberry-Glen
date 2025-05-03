@@ -190,7 +190,7 @@ go run main.go inventory.go shop.go
 
 ## 🙌 Credits
 
-- **Assets**:
+- **Assets**: [Sprout Lands -By : Cup Nooble](https://cupnooble.itch.io/sprout-lands-asset-pack)
 - **Music**:
 - **Inspiration**: Stardew Valley + Animal Crossing
 

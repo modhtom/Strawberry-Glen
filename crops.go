@@ -189,7 +189,6 @@ func tryInteract() {
 				}
 			}
 		}
-		return
 	}
 	showMessages("Nothing to interact with.", 0.5)
 }

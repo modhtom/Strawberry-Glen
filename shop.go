@@ -60,8 +60,6 @@ func addToInventory(id int, name string, reusable bool, qtyToAdd int) bool {
 	isStackable := !reusable && maxStack > 1
 	remainingQty := qtyToAdd
 	added := false
-
-	// Helper function to get minimum of two integers
 	min := func(a, b int) int {
 		if a < b {
 			return a
@@ -69,9 +67,7 @@ func addToInventory(id int, name string, reusable bool, qtyToAdd int) bool {
 		return b
 	}
 
-	// PHASE 1: Fill existing stacks first
 	if isStackable {
-		// Check all slots for existing stacks
 		for i := range playerInv.Slots {
 			if remainingQty <= 0 {
 				break
@@ -89,10 +85,8 @@ func addToInventory(id int, name string, reusable bool, qtyToAdd int) bool {
 		}
 	}
 
-	// PHASE 2: Use empty slots for remaining quantity
 	if remainingQty > 0 {
 		if isStackable {
-			// For stackable items, fill empty slots completely
 			for i := range playerInv.Slots {
 				if remainingQty <= 0 {
 					break
@@ -111,7 +105,6 @@ func addToInventory(id int, name string, reusable bool, qtyToAdd int) bool {
 				}
 			}
 		} else {
-			// For non-stackable items, use one slot per item
 			for i := 0; i < remainingQty; i++ {
 				foundSlot := false
 
@@ -136,7 +129,6 @@ func addToInventory(id int, name string, reusable bool, qtyToAdd int) bool {
 		}
 	}
 
-	// Handle remaining quantity feedback
 	if remainingQty > 0 {
 		showMessages(fmt.Sprintf("Inventory full! Couldn't add %d %s", remainingQty, name), 1.0)
 	}

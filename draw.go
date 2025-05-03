@@ -39,7 +39,7 @@ func drawScene() {
 			tex = bakerySprite
 		case "c":
 			tex = chickenHouseSprite
-		case "0":
+		case "o":
 			tex = cowSprite
 		default:
 			tex = grassSprite
