@@ -65,7 +65,7 @@ Clone the repository and run the game:
 ```
 git clone https://github.com/yourusername/strawberry-glen.git
 cd strawberry-glen
-go run main.go inventory.go shop.go
+go run .
 ```
 
 ---
@@ -150,7 +150,6 @@ go run main.go inventory.go shop.go
 
 ### 🐄 Special Items (Unlock secrets!)
 
-🎵 **Cow Flute (ID:41)** - Calms angry cows instantly  
 🍃 **Eldermint Leaves (ID:40)** - Quest item for Berry's tea
 
 ---
