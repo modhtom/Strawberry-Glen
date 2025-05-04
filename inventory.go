@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	InventorySize = 6
+	InventorySize = 8
 	itemSprites   map[int]ItemSprite
 )
 
@@ -47,8 +47,8 @@ type ItemSprite struct {
 }
 
 var Items = map[int]ItemData{
-	1: {ID: 1, Name: "Wheat Seeds", Category: "seed", IsPlantable: true, GrowsIntoID: 10, GrowthStages: 4, TimePerStage: 15.0, HarvestYield: 1, RequiresTilled: true, MaxStack: 99},
-	2: {ID: 2, Name: "Strawberry Seeds", Category: "seed", IsPlantable: true, GrowsIntoID: 11, GrowthStages: 4, TimePerStage: 20.0, HarvestYield: 2, RequiresTilled: true, MaxStack: 99},
+	1: {ID: 1, Name: "Wheat Seeds", Category: "seed", IsPlantable: true, GrowsIntoID: 10, GrowthStages: 5, TimePerStage: 15.0, HarvestYield: 1, RequiresTilled: true, MaxStack: 99},
+	2: {ID: 2, Name: "Strawberry Seeds", Category: "seed", IsPlantable: true, GrowsIntoID: 11, GrowthStages: 5, TimePerStage: 20.0, HarvestYield: 2, RequiresTilled: true, MaxStack: 99},
 
 	3: {ID: 3, Name: "Watering Can", Category: "tool"},
 	4: {ID: 4, Name: "Hoe", Category: "tool"},
@@ -56,7 +56,7 @@ var Items = map[int]ItemData{
 	6: {ID: 6, Name: "Milking Bucket", Category: "tool"},
 
 	10: {ID: 10, Name: "Wheat", Category: "crop", MaxStack: 99},
-	11: {ID: 11, Name: "Strawberry", Category: "crop", IsEdible: true, MaxStack: 99},
+	11: {ID: 11, Name: "Strawberry", Category: "crop", MaxStack: 99},
 
 	20: {ID: 20, Name: "Milk", Category: "dairy", IsEdible: true, MaxStack: 99},
 	21: {ID: 21, Name: "Butter", Category: "dairy", IsEdible: true, MaxStack: 99},
@@ -220,7 +220,7 @@ func loadItemSprites() {
 		5:  {tools, rl.NewRectangle(1*16, 0, 16, 16)},     // Axe
 		6:  {milk, rl.NewRectangle(0, 0, 16, 16)},         // Milk Bucket
 		10: {plants, rl.NewRectangle(5*16, 0, 16, 16)},    // Wheat
-		11: {plants, rl.NewRectangle(5*16, 2*16, 16, 16)}, // Strawberry
+		11: {plants, rl.NewRectangle(5*16, 1*16, 16, 16)}, // Strawberry
 		20: {milk, rl.NewRectangle(2*16, 0, 16, 16)},      // Milk
 
 		21: {rl.LoadTexture("assets/Objects/Butter.png"), rl.NewRectangle(0, 0, 32, 32)},                        //Butter

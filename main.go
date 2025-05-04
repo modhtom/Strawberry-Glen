@@ -95,7 +95,20 @@ func addGold(amount int) {
 }
 
 func input() {
-	if rl.IsKeyPressed(rl.KeyEscape) {
+	if !paused && !shopOpen && !bakeryOpen {
+		for key := rl.KeyOne; key <= rl.KeyNine; key++ {
+			if rl.IsKeyPressed(int32(key)) {
+				slotIndex := int(key - rl.KeyOne)
+				if slotIndex < len(playerInv.Slots) {
+					useInventoryItem(slotIndex)
+					playerInv.Cursor = slotIndex
+				}
+			}
+		}
+	}
+
+	if rl.IsKeyPressed(rl.KeyEscape) && !shopOpen && !bakeryOpen {
+		fmt.Println("game paused")
 		if gameState == StatePlaying {
 			paused = !paused
 		} else {
@@ -148,6 +161,10 @@ func input() {
 			playerInv.Cursor = (playerInv.Cursor + 1) % InventorySize
 		}
 		return
+	}
+
+	if rl.IsKeyPressed(rl.KeyH) {
+		tryTillSoil()
 	}
 
 	if rl.IsKeyPressed(rl.KeyB) {
@@ -464,6 +481,7 @@ func update() {
 
 	currentTileTypes := getCurrentTileTypes(playerDest.X, playerDest.Y)
 	onMud := false
+
 	for _, t := range currentTileTypes {
 		if t == "t" {
 			onMud = true
@@ -523,20 +541,26 @@ func render() {
 
 	drawMessage()
 
-	hour := int(timeOfDay * 24 / dayDuration)
-	minute := int(math.Mod(float64(timeOfDay*24*60/dayDuration), 60))
-	ampm := "AM"
-	displayHour := hour
-	if hour == 0 {
-		displayHour = 12
-	} else if hour == 12 {
-		ampm = "PM"
-	} else if hour > 12 {
-		displayHour = hour - 12
-		ampm = "PM"
-	}
+	//hour := int(timeOfDay * 24 / dayDuration)
+	//minute := int(math.Mod(float64(timeOfDay*24*60/dayDuration), 60))
+	//ampm := "AM"
+	//displayHour := hour
+	//if hour == 0 {
+	//displayHour = 12
+	//} else if hour == 12 {
+	//ampm = "PM"
+	//} else if hour > 12 {
+	//displayHour = hour - 12
+	//ampm = "PM"
+	//}
 	rl.DrawText(fmt.Sprintf("Day: %d", numberOfDays), 10, 10, 20, rl.White)
-	rl.DrawText(fmt.Sprintf("Time: %02d:%02d %s", displayHour, minute, ampm), 10, 35, 20, rl.White)
+	//rl.DrawText(fmt.Sprintf("Time: %02d:%02d %s", displayHour, minute, ampm), 10, 35, 20, rl.White)
+
+	//if hour >= 18 || hour <= 6 {
+	//	alpha := uint8(math.Abs(float64(hour-18)) * 10)
+	//	rl.DrawRectangle(0, 0, int32(screenWidth), int32(screenHeight), rl.NewColor(0, 0, 0, alpha))
+	//}
+
 	goldTextX := screenWidth - 150
 	if screenWidth < 800 {
 		goldTextX = screenWidth - 130

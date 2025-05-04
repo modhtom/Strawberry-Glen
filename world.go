@@ -123,7 +123,7 @@ func (w *World) Update() {
 	w.LastUpdate = now
 
 	for _, crop := range w.Crops {
-		if crop.GrowthStage < 3 {
+		if crop.GrowthStage < crop.MaxGrowth {
 			crop.GrowthTimer += float32(delta)
 			if crop.GrowthTimer >= 30 {
 				crop.GrowthStage++

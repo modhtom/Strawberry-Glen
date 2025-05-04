@@ -60,7 +60,13 @@ func drawScene() {
 
 	for _, crop := range world.Crops {
 		if crop != nil {
-			cropTexture := wheatGrowthSprite
+			var cropTexture rl.Texture2D
+			switch crop.CropTypeID {
+			case 11: // Strawberry
+				cropTexture = strawberryGrowthSprite
+			default: // Default to wheat (10)
+				cropTexture = wheatGrowthSprite
+			}
 
 			cropSrcRect := crop.GetSpriteRect()
 
@@ -140,6 +146,7 @@ func drawKeybindings() {
 	rl.DrawText("Movement:", int32(box.X+20), startY, 20, rl.Gold)
 	rl.DrawText("WASD/Arrow Keys - Move", int32(box.X+40), startY+30, 20, rl.White)
 	rl.DrawText("E - Interact", int32(box.X+40), startY+60, 20, rl.White)
+	rl.DrawText("H - Tile Soil", int32(box.X+40), startY+80, 20, rl.White)
 
 	rl.DrawText("Inventory/Shop:", int32(box.X+20), startY+100, 20, rl.Gold)
 	rl.DrawText("I - Open Inventory", int32(box.X+40), startY+130, 20, rl.White)

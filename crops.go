@@ -27,7 +27,11 @@ func (c *Crop) IsHarvestable() bool {
 
 func (c *Crop) GetSpriteRect() rl.Rectangle {
 	offsetX := float32(16 * c.GrowthStage)
-	return rl.NewRectangle(offsetX, 0, 16, 16)
+	offsetY := float32(0)
+	if c.CropTypeID == 11 { // Strawberry
+		offsetY = 16 * 1
+	}
+	return rl.NewRectangle(offsetX, offsetY, 16, 16)
 }
 
 type Object struct {
