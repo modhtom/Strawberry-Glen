@@ -38,12 +38,12 @@ You can find the latest alpha builds inside the `DownloadFiles` folder:
 
 ### 🪟 Windows
 
-[🍓 Download StrawberryGlen.exe](DownloadFiles/windows-build/StrawberryGlen.exe)
+[🍓 Download StrawberryGlen.exe](DownloadFiles/windows-build)
 *Path: `DownloadFiles/windows-build/StrawberryGlen.exe`*
 
 ### 🐧 Linux
 
-[🍓 Download StrawberryGlen (Linux binary)](DownloadFiles/linux-build/StrawberryGlen)
+[🍓 Download StrawberryGlen (Linux binary)](DownloadFiles/linux-build)
 *Path: `DownloadFiles/linux-build/StrawberryGlen`*
 
 > ⚠️ **Alpha Warning**:
