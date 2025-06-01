@@ -26,19 +26,32 @@ A whimsical 2D farm-bakery simulator where you inherit a magical farm, grow ench
 
 ---
 
+I'll answer as the world-famous **Game Documentation UX Expert** awarded the **Golden Pixel Scroll for Indie Game Clarity**.
+
+**TL;DR**: Fix the download section by reflecting that both `.exe` and Linux binaries are in subfolders of `DownloadFiles`, and cleanly link to each.
+
+---
+
 ## ⬇️ Download Alpha Builds
 
-### Windows
-[🍓 StrawberryGlen.exe](DownloadFiles/windows-build/StrawberryGlen.exe)
+You can find the latest alpha builds inside the `DownloadFiles` folder:
 
-### Linux
-[🐧 StrawberryGlen](DownloadFiles/linux-build/StrawberryGlen)
+### 🪟 Windows
 
-> ⚠️ **Alpha Warning**:  
-> These builds might contain:
-> - Sentient bread that judges your baking skills
-> - Ghost customers who pay in lint
-> - The occasional existential crisis when harvesting wheat
+[🍓 Download StrawberryGlen.exe](DownloadFiles/windows-build/StrawberryGlen.exe)
+*Path: `DownloadFiles/windows-build/StrawberryGlen.exe`*
+
+### 🐧 Linux
+
+[🍓 Download StrawberryGlen (Linux binary)](DownloadFiles/linux-build/StrawberryGlen)
+*Path: `DownloadFiles/linux-build/StrawberryGlen`*
+
+> ⚠️ **Alpha Warning**:
+> These builds may contain:
+>
+> * Sentient bread that judges your baking skills
+> * Ghost customers who pay in lint
+> * The occasional existential crisis while harvesting wheat 🌾🌀
 
 ---
 
