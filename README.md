@@ -2,7 +2,43 @@
 
 A whimsical 2D farm-bakery simulator where you inherit a magical farm, grow enchanted strawberries, bake quirky recipes, and unravel doughy mysteries. Earn coins, befriend moody cows, and win the Grand Glen Bake-Off!
 
+> 🚨 **ALERT: Doughy Prototype Alert!**  
+> We're in early ALPHA - which means:
+> - Strawberries might occasionally complain about the weather
+> - Cows may refuse to moo-sic sometimes
+> - Your tools might take coffee breaks
+> But hey, that's the charm of an unfinished masterpiece! 🎨
+
 ![Gameplay Preview](assets/preview.png)
+
+---
+## 🥧 How to Play (Alpha Edition)
+
+1. **Farming**:
+   - Till soil with `H` key
+   - Plant seeds from inventory slots 1-4
+   - Water crops with watering can (slot 1)
+
+2. **Baking**:
+   - Press `B` near bakery counter
+   - Use `TAB` to switch to baking mode
+   - Combine ingredients with number keys
+
+---
+
+## ⬇️ Download Alpha Builds
+
+### Windows
+[🍓 StrawberryGlen.exe](DownloadFiles/windows-build/StrawberryGlen.exe)
+
+### Linux
+[🐧 StrawberryGlen](DownloadFiles/linux-build/StrawberryGlen)
+
+> ⚠️ **Alpha Warning**:  
+> These builds might contain:
+> - Sentient bread that judges your baking skills
+> - Ghost customers who pay in lint
+> - The occasional existential crisis when harvesting wheat
 
 ---
 
@@ -123,6 +159,36 @@ go run .
 🔍 `Z/X` - Zoom in/out
 
 ---
+## 🎮 Control Cheat Sheet (Updated for Alpha)
+
+**New Alpha Controls**  
+🗑️ `ALT+1-6` - Remove ingredients while baking (because sometimes you add too much sugar!)  
+🐄 `6` + `E` near cows - Milk them (if they're in the mood)  
+🥚 `B` near chicken coop - Collect eggs (if chickens aren't on strike)
+
+---
+
+## 🆕 What's Working (Alpha v0.1)
+
+```
+✓ Planting system with growth stages
+✓ Watering mechanics
+✓ Harvesting with inventory checks
+✓ Soil tilling functionality
+✓ Progression unlocks (fertilizer, backpack upgrades)
+✓ Gold earning mechanics
+✓ Crop value system
+✓ Progression unlocks (fertilizer, backpack upgrades)
+✓ Gold earning mechanics
+✓ Crop value system
+✓ Buy/sell system with restocking
+✓ Inventory management
+✓ Limited stock mechanics
+✓ Tool system (reusable items)
+✓ Stackable items
+✓ Visual inventory display
+```
+--
 
 ## 📦 Your Pocket Universe - Item System Explained
 
