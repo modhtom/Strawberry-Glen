@@ -108,7 +108,6 @@ func input() {
 	}
 
 	if rl.IsKeyPressed(rl.KeyEscape) && !shopOpen && !bakeryOpen {
-		fmt.Println("game paused")
 		if gameState == StatePlaying {
 			paused = !paused
 		} else {
@@ -553,7 +552,7 @@ func render() {
 	//displayHour = hour - 12
 	//ampm = "PM"
 	//}
-	rl.DrawText(fmt.Sprintf("Day: %d", numberOfDays), 10, 10, 20, rl.White)
+	// rl.DrawText(fmt.Sprintf("Day: %d", numberOfDays),  10, 10, 20, rl.White)
 	//rl.DrawText(fmt.Sprintf("Time: %02d:%02d %s", displayHour, minute, ampm), 10, 35, 20, rl.White)
 
 	//if hour >= 18 || hour <= 6 {
@@ -561,11 +560,12 @@ func render() {
 	//	rl.DrawRectangle(0, 0, int32(screenWidth), int32(screenHeight), rl.NewColor(0, 0, 0, alpha))
 	//}
 
-	goldTextX := screenWidth - 150
+	TextX := screenWidth - 150
 	if screenWidth < 800 {
-		goldTextX = screenWidth - 130
+		TextX = screenWidth - 130
 	}
-	rl.DrawText(fmt.Sprintf("Gold: %d G", playerGold), int32(goldTextX), 10, 20, rl.Gold)
+	rl.DrawText(fmt.Sprintf("Day: %d", numberOfDays), int32(TextX), 10, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Gold: %d G", playerGold), int32(TextX), 30, 20, rl.Gold)
 
 	if shopOpen {
 		drawShop()
@@ -668,7 +668,50 @@ func quit() {
 	defer rl.CloseWindow()
 }
 
+func selectMenuItem(index int) {
+	switch index {
+	case 0: // Play
+		gameState = StatePlaying
+	case 1: // Continue
+		if saveFileExists {
+			gameState = StatePlaying
+		}
+	case 2: // Credits
+		gameState = StateCredits
+	case 3: // Exit
+		running = false
+	}
+}
+
 func handleMainMenu() {
+	mp := rl.GetMousePosition()
+	menuItemHeight := int32(40)
+	baseY := int32(screenHeight/2 - 50)
+	newCursor := -1
+
+	for i := range menuItems {
+		itemY := baseY + int32(i)*menuItemHeight
+		textWidth := rl.MeasureText(menuItems[i], 32)
+		bounds := rl.NewRectangle(
+			float32(screenWidth/2)-float32(textWidth/2),
+			float32(itemY),
+			float32(textWidth),
+			float32(menuItemHeight),
+		)
+
+		if rl.CheckCollisionPointRec(mp, bounds) {
+			newCursor = i
+			if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+				selectMenuItem(i)
+				return
+			}
+		}
+	}
+
+	if newCursor != -1 {
+		menuCursor = newCursor
+	}
+
 	if rl.IsKeyPressed(rl.KeyDown) {
 		menuCursor = (menuCursor + 1) % len(menuItems)
 	}
@@ -710,5 +753,4 @@ func main() {
 		}
 	}
 	quit()
-	// runEditor()
 }

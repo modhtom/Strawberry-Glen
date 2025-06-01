@@ -69,12 +69,11 @@ var Items = map[int]ItemData{
 	34: {ID: 34, Name: "Experimental Jam", Category: "baked", IsEdible: true, MaxStack: 99},
 
 	40: {ID: 40, Name: "Eldermint Leaves", Category: "quest", MaxStack: 99},
-	41: {ID: 41, Name: "Cow Flute", Category: "quest", MaxStack: 99},
 }
 
 func applyUpgrades() {
-	if progression.ActiveUpgrades["LargeBackpack"] && len(playerInv.Slots) < 7 {
-		newSlots := make([]InventorySlot, 7)
+	if progression.ActiveUpgrades["LargeBackpack"] && len(playerInv.Slots) < 8 {
+		newSlots := make([]InventorySlot, 10)
 		copy(newSlots, playerInv.Slots)
 		playerInv.Slots = newSlots
 	}

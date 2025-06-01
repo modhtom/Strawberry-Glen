@@ -25,8 +25,8 @@ type ShopItem struct {
 }
 
 var shopItems = []ShopItem{
-	{ID: 1, PriceBuy: 5, PriceSell: 2, Stock: 10, Unlocked: true},
-	{ID: 2, PriceBuy: 8, PriceSell: 3, Stock: 5, Unlocked: true},
+	{ID: 1, PriceBuy: 5, PriceSell: 2, Stock: 15, Unlocked: true},
+	{ID: 2, PriceBuy: 8, PriceSell: 3, Stock: 7, Unlocked: true},
 	{ID: 10, PriceBuy: 20, PriceSell: 8, Stock: 5, Unlocked: false},
 	{ID: 40, PriceBuy: 100, PriceSell: 40, Stock: 3, Unlocked: false},
 }
